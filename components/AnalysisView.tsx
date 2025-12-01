@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from 'react';
 import { Movie, OscarRow } from '../types';
 import { 
@@ -205,8 +204,8 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({ movies, oscarData }) => {
                             <AreaChart data={stats.yearChartData}>
                                 <defs>
                                     <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#38bdf8" stopColorOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="#38bdf8" stopColorOpacity={0}/>
+                                        <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
