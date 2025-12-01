@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Cine · Catálogo de Películas</title>
+    <!-- Tailwind via CDN for simplicity (works with Vite) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -85,6 +86,11 @@
             left: 150%;
             transition: 0.7s ease-in-out;
         }
+        
+        /* Recharts Tooltip Override */
+        .recharts-tooltip-cursor {
+            fill: rgba(255,255,255,0.05) !important;
+        }
     </style>
     <script>
         tailwind.config = {
@@ -110,16 +116,16 @@
 <script type="importmap">
 {
   "imports": {
-    "vite": "https://aistudiocdn.com/vite@^7.2.6",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "papaparse": "https://aistudiocdn.com/papaparse@^5.5.3",
     "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
     "fuse.js": "https://aistudiocdn.com/fuse.js@^7.1.0",
-    "papaparse": "https://aistudiocdn.com/papaparse@^5.5.3"
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "vite": "https://aistudiocdn.com/vite@^7.2.6",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
@@ -128,6 +134,7 @@
     <div class="bg-cinematic"></div>
     <div class="bg-noise"></div>
     <div id="root"></div>
-    <script type="module" src="/src/index.tsx"></script>
+    <!-- Point to src/main.tsx which matches standard Vite structure -->
+    <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
