@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cine · Catálogo de Películas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #e5e7eb;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Cinematic Background */
+        .bg-cinematic {
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(234, 179, 8, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 15% 70%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, #020617 0%, #000000 100%);
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+        }
+
+        /* Film Grain Overlay */
+        .bg-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #eab308;
+        }
+
+        /* Utilities */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
+        .shine-effect:hover::after {
+            left: 150%;
+            transition: 0.7s ease-in-out;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#020617',
+                        secondary: '#0f172a',
+                        accent: '#eab308', // Gold
+                        'accent-alt': '#38bdf8', // Sky
+                        card: 'rgba(15,23,42,0.8)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5",
+    "papaparse": "https://aistudiocdn.com/papaparse@^5.5.3",
+    "fuse.js": "https://aistudiocdn.com/fuse.js@^7.1.0"
+  }
+}
+</script>
+</head>
+<body>
+    <div class="bg-cinematic"></div>
+    <div class="bg-noise"></div>
+    <div id="root"></div>
+</body>
+</html>
