@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #000000;
+    color: #e5e7eb;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Cinematic Background */
+.bg-cinematic {
+    background: 
+        radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.4) 0%, transparent 60%),
+        radial-gradient(circle at 85% 30%, rgba(234, 179, 8, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 15% 70%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
+        linear-gradient(180deg, #020617 0%, #000000 100%);
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+}
+
+/* Film Grain Overlay */
+.bg-noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #eab308;
+}
+
+/* Utilities */
+.text-glow {
+    text-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
+}
+.glass-panel {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.shine-effect {
+    position: relative;
+    overflow: hidden;
+}
+.shine-effect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    transform: skewX(-25deg);
+    transition: 0.5s;
+}
+.shine-effect:hover::after {
+    left: 150%;
+    transition: 0.7s ease-in-out;
+}
+
+/* Recharts Tooltip Override */
+.recharts-tooltip-cursor {
+    fill: rgba(255,255,255,0.05) !important;
+}
