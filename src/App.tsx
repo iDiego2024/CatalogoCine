@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Movie, FilterState, ApiKeys, OscarRow } from './types';
 import { parseMoviesCSV, parseOscarExcel, normalizeTitle } from './utils';
@@ -199,14 +198,13 @@ function App() {
       const statsMap: Record<string, {title: string, wins: number, noms: number, isWinner: boolean}> = {};
 
       yearData.forEach(row => {
-          let entry = statsMap[row.Film];
-          if (!entry) {
-              entry = { title: row.Film, wins: 0, noms: 0, isWinner: false };
-              statsMap[row.Film] = entry;
+          if (!statsMap[row.Film]) {
+              statsMap[row.Film] = { title: row.Film, wins: 0, noms: 0, isWinner: false };
           }
-          entry.noms = entry.noms + 1;
+          const entry = statsMap[row.Film];
+          entry.noms += 1;
           if (row.IsWinner) {
-              entry.wins = entry.wins + 1;
+              entry.wins += 1;
               entry.isWinner = true;
           }
       });
