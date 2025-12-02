@@ -204,16 +204,16 @@ function App() {
               entry = { title: row.Film, wins: 0, noms: 0, isWinner: false };
               statsMap[row.Film] = entry;
           }
-          entry.noms = (entry.noms as number) + 1;
+          entry.noms = entry.noms + 1;
           if (row.IsWinner) {
-              entry.wins = (entry.wins as number) + 1;
+              entry.wins = entry.wins + 1;
               entry.isWinner = true;
           }
       });
 
       return Object.values(statsMap).sort((a, b) => {
-          if ((b.wins as number) !== (a.wins as number)) return (b.wins as number) - (a.wins as number); // Sort by wins
-          return (b.noms as number) - (a.noms as number); // Then by noms
+          if (b.wins !== a.wins) return b.wins - a.wins; // Sort by wins
+          return b.noms - a.noms; // Then by noms
       });
   }, [oscarFiltered, oscarYear]);
 
@@ -390,7 +390,7 @@ function App() {
                                             acc[g] = (acc[g] || 0) + 1;
                                             return acc;
                                         }, {});
-                                        const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+                                        const sorted = Object.entries(genreCounts).sort(([, countA], [, countB]) => countB - countA);
                                         return sorted[0]?.[0] || 'N/A';
                                     })()}
                                 </div>
