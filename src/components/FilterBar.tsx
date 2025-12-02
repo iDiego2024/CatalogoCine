@@ -23,8 +23,19 @@ const FilterBar = ({
       setFilters(prev => ({ ...prev, yearRange: [startYear, endYear] }));
   };
 
-  const setMinRating = (rating: number) => {
-      setFilters(prev => ({ ...prev, ratingRange: [rating, 10] }));
+  const setRatingBound = (bound: 'min' | 'max', value: number) => {
+      setFilters(prev => {
+          const newRange: [number, number] = [...prev.ratingRange];
+          if (bound === 'min') newRange[0] = value;
+          else newRange[1] = value;
+          
+          // Auto-correct if min > max
+          if (newRange[0] > newRange[1]) {
+              if (bound === 'min') newRange[1] = value;
+              else newRange[0] = value;
+          }
+          return { ...prev, ratingRange: newRange };
+      });
   };
 
   const handleRangeChange = (type: 'year' | 'rating', index: 0 | 1, val: string) => {
@@ -96,7 +107,7 @@ const FilterBar = ({
 
       {/* Popover */}
       {active && (
-        <div className="absolute top-full mt-2 left-0 z-50 min-w-[320px] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
+        <div className="absolute top-full mt-2 left-0 z-50 min-w-[340px] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
            <div className="mb-4 flex justify-between items-center border-b border-white/5 pb-2">
              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <Icon size={12}/> {label}
@@ -106,12 +117,13 @@ const FilterBar = ({
            
            {id === 'year' && (
               <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                      {[2020, 2010, 2000, 1990, 1980, 1970].map(y => (
+                  <div className="grid grid-cols-4 gap-2 mb-4">
+                      {/* Generar décadas desde 2020 hasta 1920 */}
+                      {[2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920].map(y => (
                           <button 
                             key={y} 
                             onClick={() => setDecade(y)}
-                            className={`px-2 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                            className={`px-1 py-2 rounded-lg text-xs font-bold border transition-colors ${
                                 filters.yearRange[0] === y && filters.yearRange[1] === y + 9 
                                 ? 'bg-accent text-black border-accent' 
                                 : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
@@ -122,13 +134,13 @@ const FilterBar = ({
                       ))}
                       <button 
                         onClick={() => setDecade(1900)}
-                        className={`col-span-3 px-2 py-2 rounded-lg text-xs font-bold border transition-colors ${
-                            filters.yearRange[0] === 1900 && filters.yearRange[1] === 1969
+                        className={`col-span-1 px-1 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                            filters.yearRange[0] === 1900 && filters.yearRange[1] === 1919
                             ? 'bg-accent text-black border-accent' 
                             : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
                         }`}
                       >
-                          Clásicos (&lt;1970)
+                          &lt;1920
                       </button>
                   </div>
 
@@ -148,22 +160,47 @@ const FilterBar = ({
            )}
 
            {id === 'rating' && (
-              <div className="space-y-4">
-                  <div className="mb-4">
+              <div className="space-y-6">
+                  {/* Min Rating */}
+                  <div>
                       <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Mínima</label>
                       <div className="flex gap-1">
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
                               <button 
-                                key={r}
-                                onClick={() => setMinRating(r)}
+                                key={`min-${r}`}
+                                onClick={() => setRatingBound('min', r)}
                                 className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
                                     filters.ratingRange[0] === r 
-                                    ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110' 
-                                    : r < 5 
+                                    ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110 z-10' 
+                                    : r <= 4 
                                         ? 'bg-red-500/10 text-red-500 hover:bg-red-500/30'
-                                        : r < 8 
-                                            ? 'bg-white/5 text-slate-300 hover:bg-white/20'
-                                            : 'bg-green-500/10 text-green-400 hover:bg-green-500/30'
+                                        : r >= 8 
+                                            ? 'bg-green-500/10 text-green-400 hover:bg-green-500/30'
+                                            : 'bg-white/5 text-slate-300 hover:bg-white/20'
+                                }`}
+                              >
+                                  {r}
+                              </button>
+                          ))}
+                      </div>
+                  </div>
+
+                  {/* Max Rating */}
+                  <div>
+                      <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Máxima</label>
+                      <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
+                              <button 
+                                key={`max-${r}`}
+                                onClick={() => setRatingBound('max', r)}
+                                className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
+                                    filters.ratingRange[1] === r 
+                                    ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110 z-10' 
+                                    : r <= 4 
+                                        ? 'bg-red-500/10 text-red-500 hover:bg-red-500/30'
+                                        : r >= 8 
+                                            ? 'bg-green-500/10 text-green-400 hover:bg-green-500/30'
+                                            : 'bg-white/5 text-slate-300 hover:bg-white/20'
                                 }`}
                               >
                                   {r}
