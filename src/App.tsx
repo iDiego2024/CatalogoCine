@@ -190,7 +190,7 @@ function App() {
 
   const availableOscarYears = useMemo(() => {
     const years = new Set(oscarData.map(o => o.FilmYear).filter((y): y is number => y !== null));
-    return Array.from(years).sort((a: number, b: number) => b - a);
+    return Array.from(years).sort((a: number, b: number) => Number(b) - Number(a));
   }, [oscarData]);
 
   // Calculate Ranking/Leaderboard for the current year
@@ -212,8 +212,8 @@ function App() {
       });
 
       return Object.values(statsMap).sort((a: {wins: number, noms: number}, b: {wins: number, noms: number}) => {
-          if (b.wins !== a.wins) return b.wins - a.wins; // Sort by wins
-          return b.noms - a.noms; // Then by noms
+          if (Number(b.wins) !== Number(a.wins)) return Number(b.wins) - Number(a.wins); // Sort by wins
+          return Number(b.noms) - Number(a.noms); // Then by noms
       });
   }, [oscarFiltered, oscarYear]);
 
@@ -252,7 +252,7 @@ function App() {
     <div className="min-h-screen text-slate-200 font-sans selection:bg-accent/30 selection:text-white flex flex-col relative">
       <SettingsModal 
         isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
-        onFileUpload={handleFileUpload} apiKeys={apiKeys} setApiKeys={setApiKeys}
+        onFileUpload={handleFileUpload} 
       />
 
       {/* Header */}
@@ -292,7 +292,7 @@ function App() {
                      {[
                         { id: 'catalog', label: 'Catálogo', icon: List },
                         { id: 'analysis', label: 'Análisis', icon: BarChart3 },
-                        { id: 'oscars', label: 'Premios Oscar', icon: Trophy },
+                        { id: 'oscars', label: 'Premios', icon: Trophy },
                         { id: 'afi', label: 'Lista AFI', icon: Star },
                         { id: 'random', label: 'Qué ver hoy', icon: Dice5 },
                       ].map(tab => (
@@ -542,14 +542,14 @@ function App() {
                     </div>
                         
                     {/* Content */}
-                    <div className="space-y-8">
+                    <div className="space-y-12">
                         {oscarDisplayData.map(([category, items]) => (
                              <div key={category} className="animate-in slide-in-from-bottom-2 duration-500">
-                                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 border-b border-white/5 pb-2 flex items-center gap-2">
+                                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] mb-6 border-b border-white/5 pb-2 flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-accent/50"></span>
                                     {category}
                                  </h3>
-                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                                      {items.map((o, i) => (
                                          <OscarCard key={`${category}-${i}`} item={o} apiKeys={apiKeys} />
                                      ))}

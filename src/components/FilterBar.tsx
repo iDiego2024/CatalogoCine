@@ -1,5 +1,4 @@
-
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { FilterState } from '../types';
 import { ChevronDown, Calendar, Star, Film, Megaphone, X, Check, Filter, Trash2 } from 'lucide-react';
 
@@ -10,121 +9,32 @@ interface FilterBarProps {
   availableDirectors: string[];
 }
 
-// --- Internal Component: DualRangeSlider (Timeline) ---
-const DualRangeSlider = ({ 
-    min, 
-    max, 
-    value, 
-    onChange, 
-    step = 1,
-    formatLabel
-}: { 
-    min: number; 
-    max: number; 
-    value: [number, number]; 
-    onChange: (val: [number, number]) => void;
-    step?: number;
-    formatLabel?: (val: number) => string;
-}) => {
-    const sliderRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null);
-
-    // Calculate percentage for positioning
-    const getPercent = useCallback((val: number) => 
-        Math.round(((val - min) / (max - min)) * 100), 
-    [min, max]);
-
-    const handleMouseDown = (type: 'min' | 'max') => (e: React.MouseEvent) => {
-        setIsDragging(type);
-        e.preventDefault();
-    };
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isDragging || !sliderRef.current) return;
-
-            const rect = sliderRef.current.getBoundingClientRect();
-            const percent = Math.min(Math.max(0, (e.clientX - rect.left) / rect.width), 1);
-            const rawValue = min + (percent * (max - min));
-            const newValue = Math.round(rawValue / step) * step;
-
-            if (isDragging === 'min') {
-                const clamped = Math.min(newValue, value[1] - step);
-                if (clamped >= min) onChange([clamped, value[1]]);
-            } else {
-                const clamped = Math.max(newValue, value[0] + step);
-                if (clamped <= max) onChange([value[0], clamped]);
-            }
-        };
-
-        const handleMouseUp = () => {
-            setIsDragging(null);
-        };
-
-        if (isDragging) {
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        }
-
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isDragging, min, max, step, value, onChange]);
-
-    return (
-        <div className="pt-6 pb-2 px-2 select-none">
-            <div className="relative w-full h-1 bg-slate-700 rounded-full" ref={sliderRef}>
-                {/* Active Track */}
-                <div 
-                    className="absolute h-full bg-accent rounded-full shadow-[0_0_10px_rgba(234,179,8,0.5)]"
-                    style={{ 
-                        left: `${getPercent(value[0])}%`, 
-                        width: `${getPercent(value[1]) - getPercent(value[0])}%` 
-                    }}
-                />
-
-                {/* Min Thumb */}
-                <div 
-                    className="absolute w-4 h-4 bg-white border-2 border-accent rounded-full -top-1.5 -ml-2 cursor-grab active:cursor-grabbing shadow-lg hover:scale-125 transition-transform z-10"
-                    style={{ left: `${getPercent(value[0])}%` }}
-                    onMouseDown={handleMouseDown('min')}
-                >
-                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-accent bg-black/80 px-1.5 py-0.5 rounded border border-white/10 whitespace-nowrap">
-                        {formatLabel ? formatLabel(value[0]) : value[0]}
-                    </div>
-                </div>
-
-                {/* Max Thumb */}
-                <div 
-                    className="absolute w-4 h-4 bg-white border-2 border-accent rounded-full -top-1.5 -ml-2 cursor-grab active:cursor-grabbing shadow-lg hover:scale-125 transition-transform z-10"
-                    style={{ left: `${getPercent(value[1])}%` }}
-                    onMouseDown={handleMouseDown('max')}
-                >
-                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-accent bg-black/80 px-1.5 py-0.5 rounded border border-white/10 whitespace-nowrap">
-                        {formatLabel ? formatLabel(value[1]) : value[1]}
-                    </div>
-                </div>
-
-                {/* Ticks / Ruler */}
-                <div className="absolute top-4 left-0 w-full flex justify-between text-[9px] text-slate-600 font-mono pointer-events-none">
-                    <span>{min}</span>
-                    <span>{Math.round((min + max) / 2)}</span>
-                    <span>{max}</span>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-
-const FilterBar: React.FC<FilterBarProps> = ({
+const FilterBar = ({
   filters, setFilters, availableGenres, availableDirectors
-}) => {
+}: FilterBarProps) => {
   const [activePopover, setActivePopover] = useState<'year' | 'rating' | 'genres' | 'directors' | null>(null);
 
   const togglePopover = (type: 'year' | 'rating' | 'genres' | 'directors') => {
     setActivePopover(activePopover === type ? null : type);
+  };
+
+  const setDecade = (startYear: number) => {
+      const endYear = startYear === 1900 ? 1969 : startYear + 9;
+      setFilters(prev => ({ ...prev, yearRange: [startYear, endYear] }));
+  };
+
+  const setMinRating = (rating: number) => {
+      setFilters(prev => ({ ...prev, ratingRange: [rating, 10] }));
+  };
+
+  const handleRangeChange = (type: 'year' | 'rating', index: 0 | 1, val: string) => {
+    const num = parseInt(val, 10);
+    if (isNaN(num)) return;
+    setFilters(prev => {
+        const newRange = type === 'year' ? [...prev.yearRange] : [...prev.ratingRange];
+        newRange[index] = num;
+        return { ...prev, [type === 'year' ? 'yearRange' : 'ratingRange']: newRange };
+    });
   };
 
   const toggleSelection = (type: 'genres' | 'directors', val: string) => {
@@ -186,7 +96,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
       {/* Popover */}
       {active && (
-        <div className="absolute top-full mt-2 left-0 z-50 min-w-[300px] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
+        <div className="absolute top-full mt-2 left-0 z-50 min-w-[320px] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
            <div className="mb-4 flex justify-between items-center border-b border-white/5 pb-2">
              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <Icon size={12}/> {label}
@@ -195,38 +105,85 @@ const FilterBar: React.FC<FilterBarProps> = ({
            </div>
            
            {id === 'year' && (
-              <div className="space-y-6">
-                  <div className="flex justify-between text-xs text-white font-bold px-1">
-                      <span>{filters.yearRange[0]}</span>
-                      <span className="text-slate-500">-</span>
-                      <span>{filters.yearRange[1]}</span>
+              <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                      {[2020, 2010, 2000, 1990, 1980, 1970].map(y => (
+                          <button 
+                            key={y} 
+                            onClick={() => setDecade(y)}
+                            className={`px-2 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                                filters.yearRange[0] === y && filters.yearRange[1] === y + 9 
+                                ? 'bg-accent text-black border-accent' 
+                                : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                            }`}
+                          >
+                              {y}s
+                          </button>
+                      ))}
+                      <button 
+                        onClick={() => setDecade(1900)}
+                        className={`col-span-3 px-2 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                            filters.yearRange[0] === 1900 && filters.yearRange[1] === 1969
+                            ? 'bg-accent text-black border-accent' 
+                            : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                          Clásicos (&lt;1970)
+                      </button>
                   </div>
-                  <DualRangeSlider 
-                    min={1920} 
-                    max={new Date().getFullYear()} 
-                    value={filters.yearRange} 
-                    onChange={(val) => setFilters(prev => ({ ...prev, yearRange: val }))}
-                  />
-                  <div className="text-[10px] text-slate-500 text-center mt-2">Rango de años de estreno</div>
+
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                      <div className="flex-1">
+                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Desde</label>
+                          <input type="number" value={filters.yearRange[0]} onChange={e => handleRangeChange('year', 0, e.target.value)} 
+                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" placeholder="1900" />
+                      </div>
+                      <div className="flex-1">
+                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Hasta</label>
+                          <input type="number" value={filters.yearRange[1]} onChange={e => handleRangeChange('year', 1, e.target.value)} 
+                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" placeholder="2024" />
+                      </div>
+                  </div>
               </div>
            )}
 
            {id === 'rating' && (
-              <div className="space-y-6">
-                  <div className="flex justify-between text-xs text-white font-bold px-1">
-                      <span>★ {filters.ratingRange[0]}</span>
-                      <span className="text-slate-500">-</span>
-                      <span>★ {filters.ratingRange[1]}</span>
+              <div className="space-y-4">
+                  <div className="mb-4">
+                      <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Mínima</label>
+                      <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
+                              <button 
+                                key={r}
+                                onClick={() => setMinRating(r)}
+                                className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
+                                    filters.ratingRange[0] === r 
+                                    ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110' 
+                                    : r < 5 
+                                        ? 'bg-red-500/10 text-red-500 hover:bg-red-500/30'
+                                        : r < 8 
+                                            ? 'bg-white/5 text-slate-300 hover:bg-white/20'
+                                            : 'bg-green-500/10 text-green-400 hover:bg-green-500/30'
+                                }`}
+                              >
+                                  {r}
+                              </button>
+                          ))}
+                      </div>
                   </div>
-                  <DualRangeSlider 
-                    min={0} 
-                    max={10} 
-                    step={0.5}
-                    value={filters.ratingRange} 
-                    onChange={(val) => setFilters(prev => ({ ...prev, ratingRange: val }))}
-                    formatLabel={(v) => v.toFixed(1)}
-                  />
-                  <div className="text-[10px] text-slate-500 text-center mt-2">Rango de nota personal o IMDb</div>
+
+                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                      <div className="flex-1">
+                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Mínima</label>
+                          <input type="number" min="0" max="10" value={filters.ratingRange[0]} onChange={e => handleRangeChange('rating', 0, e.target.value)} 
+                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" />
+                      </div>
+                      <div className="flex-1">
+                           <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Máxima</label>
+                          <input type="number" min="0" max="10" value={filters.ratingRange[1]} onChange={e => handleRangeChange('rating', 1, e.target.value)} 
+                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" />
+                      </div>
+                  </div>
               </div>
            )}
 
