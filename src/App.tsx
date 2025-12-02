@@ -9,6 +9,7 @@ import MovieCard from './components/MovieCard';
 import OscarCard from './components/OscarCard';
 import OscarMovieSummary from './components/OscarMovieSummary';
 import AnalysisView from './components/AnalysisView';
+import AFICard from './components/AFICard';
 import { Search, Trophy, Clapperboard, Award, BarChart3, List, Dice5, Star, Settings, Flame, ChevronLeft, ChevronRight, Loader2, Play } from 'lucide-react';
 import Fuse from 'fuse.js';
 
@@ -199,6 +200,7 @@ function App() {
       const statsMap: Record<string, {title: string, wins: number, noms: number, isWinner: boolean}> = {};
 
       yearData.forEach(row => {
+          if (!row.Film) return;
           let entry = statsMap[row.Film];
           if (!entry) {
               entry = { title: row.Film, wins: 0, noms: 0, isWinner: false };
@@ -240,19 +242,26 @@ function App() {
     return Object.entries(grouped).sort((a, b) => a[0].localeCompare(b[0]));
   }, [oscarFiltered, oscarYear, showOnlyWinners]);
 
-  // Scroll timeline to active year
-  useEffect(() => {
-     if (activeTab === 'oscars' && timelineRef.current) {
-        // Simple scroll logic could go here
-     }
-  }, [activeTab]);
+  // Oscar Decade Logic
+  const jumpToDecade = (decade: number) => {
+      const target = availableOscarYears.find(y => y <= decade + 9 && y >= decade);
+      if (target) {
+          setOscarYear(target);
+          if (timelineRef.current) {
+              // Basic scroll attempt
+              const idx = availableOscarYears.indexOf(target);
+              const buttonWidth = 70; // approx
+              timelineRef.current.scrollTo({ left: idx * buttonWidth, behavior: 'smooth' });
+          }
+      }
+  };
 
   // ================= Render =================
   return (
     <div className="min-h-screen text-slate-200 font-sans selection:bg-accent/30 selection:text-white flex flex-col relative">
       <SettingsModal 
         isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
-        onFileUpload={handleFileUpload} 
+        onFileUpload={handleFileUpload}
       />
 
       {/* Header */}
@@ -475,12 +484,12 @@ function App() {
             {activeTab === 'oscars' && (
                 <div className="space-y-8 animate-in fade-in duration-700">
                     
-                    {/* Header with Timeline */}
-                    <div className="glass-panel p-6 rounded-2xl border border-white/5 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-900/10 to-transparent"></div>
+                    {/* Header with Film Reel Decade Selector */}
+                    <div className="glass-panel p-0 rounded-2xl border border-white/5 relative overflow-hidden bg-black/40">
+                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-900/5 to-transparent"></div>
                         
                         {/* Title Row */}
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10 mb-10">
+                        <div className="p-6 pb-0 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
                              <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-gradient-to-b from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(234,179,8,0.3)] border-2 border-yellow-200/20">
                                     <Trophy size={24} className="text-yellow-950 drop-shadow-md" strokeWidth={2} />
@@ -504,40 +513,50 @@ function App() {
                             </label>
                         </div>
 
-                        {/* Timeline */}
-                        <div className="relative w-full h-16 flex items-center group/timeline">
-                             {/* Line */}
-                             <div className="absolute left-0 right-0 top-1/2 h-px bg-white/10 z-0"></div>
+                        {/* Decade Jumpers */}
+                        <div className="px-6 mt-6 flex gap-1 flex-wrap justify-center md:justify-start relative z-20">
+                            {[2020, 2010, 2000, 1990, 1980, 1970, 1960].map(decade => (
+                                <button key={decade} onClick={() => jumpToDecade(decade)} className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded text-[10px] font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider">
+                                    {decade}s
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Film Reel Timeline */}
+                        <div className="relative w-full h-24 flex items-center group/timeline mt-4 border-y-2 border-white/5 bg-black/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]">
+                             {/* Film Perforations Top */}
+                             <div className="absolute top-1 left-0 right-0 h-2 flex justify-between px-1 pointer-events-none">
+                                 {Array.from({length: 40}).map((_, i) => <div key={i} className="w-3 h-1.5 bg-white/10 rounded-sm"></div>)}
+                             </div>
                              
                              {/* Scrollable Container */}
                              <div 
                                 ref={timelineRef}
-                                className="relative w-full overflow-x-auto flex items-center gap-8 px-[40%] custom-scrollbar pb-4 pt-4 z-10 snap-x"
+                                className="relative w-full overflow-x-auto flex items-center gap-4 px-[40%] custom-scrollbar pb-2 pt-2 z-10 snap-x"
                                 style={{ scrollBehavior: 'smooth' }}
                              >
                                 {availableOscarYears.map(year => (
                                     <button
                                         key={year}
                                         onClick={() => setOscarYear(year)}
-                                        className={`shrink-0 relative flex flex-col items-center justify-center min-w-[60px] h-full group transition-all snap-center ${
-                                            oscarYear === year ? 'opacity-100 scale-110' : 'opacity-40 hover:opacity-80'
+                                        className={`shrink-0 relative flex flex-col items-center justify-center w-16 h-16 group transition-all duration-300 snap-center border border-white/10 rounded-md ${
+                                            oscarYear === year ? 'bg-gradient-to-b from-yellow-600/20 to-yellow-900/20 border-yellow-500/50 scale-110 z-20 shadow-[0_0_20px_rgba(234,179,8,0.2)]' : 'bg-white/5 hover:bg-white/10 hover:border-white/20'
                                         }`}
                                     >
-                                        <span className={`text-xs font-bold mb-3 transition-colors ${oscarYear === year ? 'text-accent' : 'text-slate-400'}`}>{year}</span>
-                                        <div className={`w-3 h-3 rounded-full transition-all duration-300 relative z-10 ${
-                                            oscarYear === year 
-                                            ? 'bg-accent shadow-[0_0_15px_rgba(234,179,8,0.8)] scale-125' 
-                                            : 'bg-slate-700 group-hover:bg-white'
-                                        }`}></div>
-                                        {/* Vertical tick */}
-                                        <div className={`w-px h-3 mt-2 ${oscarYear === year ? 'bg-accent/50' : 'bg-white/10'}`}></div>
+                                        <span className={`text-sm font-black transition-colors ${oscarYear === year ? 'text-white' : 'text-slate-500'}`}>{year}</span>
+                                        {oscarYear === year && <div className="text-[9px] text-accent uppercase font-bold tracking-wider mt-1">Select</div>}
                                     </button>
                                 ))}
                              </div>
                              
+                             {/* Film Perforations Bottom */}
+                             <div className="absolute bottom-1 left-0 right-0 h-2 flex justify-between px-1 pointer-events-none">
+                                 {Array.from({length: 40}).map((_, i) => <div key={i} className="w-3 h-1.5 bg-white/10 rounded-sm"></div>)}
+                             </div>
+
                              {/* Fade Edges */}
-                             <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0f172a] to-transparent pointer-events-none z-20"></div>
-                             <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0f172a] to-transparent pointer-events-none z-20"></div>
+                             <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0f172a] to-transparent pointer-events-none z-20"></div>
+                             <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0f172a] to-transparent pointer-events-none z-20"></div>
                         </div>
                     </div>
                         
@@ -640,7 +659,7 @@ function App() {
             
             {/* AFI Tab */}
             {activeTab === 'afi' && (
-                 <div className="max-w-[1920px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+                 <div className="max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
                     {/* Header Card */}
                     <div className="glass-panel rounded-3xl border border-white/10 overflow-hidden shadow-2xl mb-10">
                         <div className="p-10 border-b border-white/10 bg-black/40 backdrop-blur flex flex-col md:flex-row justify-between items-center relative overflow-hidden gap-6">
@@ -663,47 +682,19 @@ function App() {
                         </div>
                     </div>
 
-                    {/* Movie Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-5 gap-y-10">
+                    {/* Movie List (Vertical) */}
+                    <div className="space-y-6">
                         {AFI_LIST.map(a => {
                             const match = movies.find(m => m.NormTitle === normalizeTitle(a.Title));
-                            
-                            // Construct a valid movie object (either real or mock)
-                            const displayMovie: Movie = match || {
-                                Title: a.Title,
-                                Year: a.Year,
-                                "Your Rating": null,
-                                "IMDb Rating": null,
-                                Genres: "",
-                                GenreList: [],
-                                Directors: "",
-                                "Date Rated": null,
-                                URL: "",
-                                NormTitle: normalizeTitle(a.Title),
-                                SearchText: ""
-                            };
-
                             return (
-                                <div key={a.Rank} className="relative group">
-                                    {/* Rank Badge */}
-                                    <div className="absolute -top-3 -left-3 z-30 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-black text-white text-sm shadow-[0_5px_15px_rgba(37,99,235,0.4)] border-4 border-[#020617]">
-                                        {a.Rank}
-                                    </div>
-                                    
-                                    {/* Card */}
-                                    <div className={match ? '' : 'grayscale opacity-60 mix-blend-luminosity brightness-75 contrast-125'}>
-                                        <MovieCard movie={displayMovie} apiKeys={apiKeys} showAwards={true} />
-                                    </div>
-
-                                    {/* Missing Indicator Overlay (Optional, visually subtle) */}
-                                    {!match && (
-                                        <div className="absolute top-2 right-2 z-30 pointer-events-none">
-                                            <div className="bg-black/60 backdrop-blur border border-white/10 px-2 py-1 rounded text-[9px] font-bold text-slate-400 uppercase tracking-wide">
-                                                Falta
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                <AFICard 
+                                    key={a.Rank} 
+                                    rank={a.Rank} 
+                                    title={a.Title} 
+                                    year={a.Year} 
+                                    movie={match || null} 
+                                    apiKeys={apiKeys} 
+                                />
                             )
                         })}
                     </div>
