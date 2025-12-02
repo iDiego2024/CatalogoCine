@@ -204,9 +204,9 @@ function App() {
               entry = { title: row.Film, wins: 0, noms: 0, isWinner: false };
               statsMap[row.Film] = entry;
           }
-          entry.noms = entry.noms + 1;
+          entry.noms += 1;
           if (row.IsWinner) {
-              entry.wins = entry.wins + 1;
+              entry.wins += 1;
               entry.isWinner = true;
           }
       });
@@ -691,7 +691,7 @@ function App() {
                                     </div>
                                     
                                     {/* Card */}
-                                    <div className={match ? '' : 'grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500'}>
+                                    <div className={match ? '' : 'grayscale opacity-60 mix-blend-luminosity brightness-75 contrast-125'}>
                                         <MovieCard movie={displayMovie} apiKeys={apiKeys} showAwards={true} />
                                     </div>
 

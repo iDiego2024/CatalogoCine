@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Movie, FilterState, ApiKeys, OscarRow } from './types';
 import { parseMoviesCSV, parseOscarExcel, normalizeTitle } from './utils';
@@ -198,10 +199,11 @@ function App() {
       const statsMap: Record<string, {title: string, wins: number, noms: number, isWinner: boolean}> = {};
 
       yearData.forEach(row => {
-          if (!statsMap[row.Film]) {
-              statsMap[row.Film] = { title: row.Film, wins: 0, noms: 0, isWinner: false };
+          let entry = statsMap[row.Film];
+          if (!entry) {
+              entry = { title: row.Film, wins: 0, noms: 0, isWinner: false };
+              statsMap[row.Film] = entry;
           }
-          const entry = statsMap[row.Film];
           entry.noms += 1;
           if (row.IsWinner) {
               entry.wins += 1;
@@ -689,7 +691,7 @@ function App() {
                                     </div>
                                     
                                     {/* Card */}
-                                    <div className={match ? '' : 'grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500'}>
+                                    <div className={match ? '' : 'grayscale opacity-60 mix-blend-luminosity brightness-75 contrast-125'}>
                                         <MovieCard movie={displayMovie} apiKeys={apiKeys} showAwards={true} />
                                     </div>
 
