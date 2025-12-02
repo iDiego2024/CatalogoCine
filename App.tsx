@@ -390,7 +390,7 @@ function App() {
                                             acc[g] = (acc[g] || 0) + 1;
                                             return acc;
                                         }, {});
-                                        const sorted = Object.entries(genreCounts).sort(([, countA], [, countB]) => countB - countA);
+                                        const sorted = Object.entries(genreCounts).sort(([, countA], [, countB]) => Number(countB) - Number(countA));
                                         return sorted[0]?.[0] || 'N/A';
                                     })()}
                                 </div>

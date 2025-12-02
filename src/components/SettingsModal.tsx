@@ -1,22 +1,20 @@
+
 import React, { useState } from 'react';
-import { ApiKeys } from '../types';
 import { CHANGELOG } from '../constants';
-import { Upload, Settings, X, FileText, Key, History } from 'lucide-react';
+import { Upload, Settings, X, FileText, History } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onFileUpload: (file: File, type: 'movies' | 'oscars') => void;
-  apiKeys: ApiKeys;
-  setApiKeys: (k: ApiKeys) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
-  isOpen, onClose, onFileUpload, apiKeys, setApiKeys
+  isOpen, onClose, onFileUpload
 }) => {
   if (!isOpen) return null;
 
-  const [activeTab, setActiveTab] = useState<'data' | 'api' | 'changelog'>('data');
+  const [activeTab, setActiveTab] = useState<'data' | 'changelog'>('data');
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -40,12 +38,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             >
               <FileText size={16} /> Datos
             </button>
-            <button 
-              onClick={() => setActiveTab('api')}
-              className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${activeTab === 'api' ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:bg-white/5'}`}
-            >
-              <Key size={16} /> APIs
-            </button>
              <button 
               onClick={() => setActiveTab('changelog')}
               className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${activeTab === 'changelog' ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:bg-white/5'}`}
@@ -56,7 +48,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Mobile Tabs */}
           <div className="sm:hidden flex border-b border-slate-700">
-            {['data', 'api', 'changelog'].map((tab) => (
+            {['data', 'changelog'].map((tab) => (
                 <button
                     key={tab}
                     onClick={() => setActiveTab(tab as any)}
@@ -99,29 +91,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       </label>
                    </div>
                  </div>
-              </div>
-            )}
-
-            {activeTab === 'api' && (
-              <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-                <h3 className="text-lg font-bold text-white mb-4">Configuración de APIs</h3>
-                <div className="space-y-4">
-                  <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">TMDb API Key</label>
-                      <input type="password" value={apiKeys.tmdb} onChange={e => setApiKeys({...apiKeys, tmdb: e.target.value})} 
-                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none" placeholder="Ingresa tu clave de TMDb" />
-                  </div>
-                  <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">OMDb API Key</label>
-                      <input type="password" value={apiKeys.omdb} onChange={e => setApiKeys({...apiKeys, omdb: e.target.value})} 
-                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none" placeholder="Ingresa tu clave de OMDb" />
-                  </div>
-                  <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">YouTube API Key</label>
-                      <input type="password" value={apiKeys.youtube} onChange={e => setApiKeys({...apiKeys, youtube: e.target.value})} 
-                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none" placeholder="Ingresa tu clave de Google Cloud" />
-                  </div>
-                </div>
               </div>
             )}
 
