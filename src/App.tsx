@@ -9,7 +9,7 @@ import OscarCard from './components/OscarCard';
 import AFICard from './components/AFICard';
 import OscarMovieSummary from './components/OscarMovieSummary';
 import AnalysisView from './components/AnalysisView';
-import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play } from 'lucide-react';
 import Fuse from 'fuse.js';
 
 const DEFAULT_API_KEYS: ApiKeys = {
@@ -41,6 +41,7 @@ function App() {
 
   const [apiKeys] = useState<ApiKeys>(DEFAULT_API_KEYS);
 
+  // Carga de datos desde servidor
   useEffect(() => {
     const loadData = async () => {
         setIsDataLoading(true);
@@ -69,7 +70,7 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Sync filters to movie bounds
+  // Sincronizar filtros al detectar películas
   useEffect(() => {
     if (movies.length > 0) {
       const years = movies.map(m => m.Year).filter((y): y is number => y !== null && y > 1800);
@@ -82,9 +83,11 @@ function App() {
     }
   }, [movies]);
 
+  // Fix: Adding missing memoized values for available genres and directors
   const availableGenres = useMemo(() => Array.from(new Set(movies.flatMap(m => m.GenreList))).sort(), [movies]);
   const availableDirectors = useMemo(() => Array.from(new Set(movies.flatMap(m => m.Directors.split(',').map(d => d.trim()).filter(Boolean)))).sort(), [movies]);
 
+  // Filtrado y Búsqueda
   useEffect(() => {
     let result = movies.filter(m => {
         const y = m.Year || 0;
@@ -187,7 +190,7 @@ function App() {
                   <div className="relative group w-full">
                        <input 
                            type="text" 
-                           placeholder="Buscar..." 
+                           placeholder="Buscar película..." 
                            value={searchQuery}
                            onChange={(e) => setSearchQuery(e.target.value)}
                            className="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:border-accent/50 outline-none backdrop-blur-md"
@@ -198,13 +201,19 @@ function App() {
 
               <nav className="flex items-center gap-4">
                   <div className="hidden lg:flex items-center gap-1">
-                     {['catalog', 'analysis', 'oscars', 'afi', 'random'].map(tab => (
-                        <button key={tab} onClick={() => setActiveTab(tab as any)} className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'text-white border-b-2 border-accent' : 'text-slate-500 hover:text-slate-300'}`}>
-                            {tab === 'catalog' ? 'Catálogo' : tab === 'analysis' ? 'Análisis' : tab === 'oscars' ? 'Premios Oscar' : tab === 'afi' ? 'Lista AFI' : 'Sugerencia'}
+                     {[
+                        { id: 'catalog', label: 'Catálogo' },
+                        { id: 'analysis', label: 'Análisis' },
+                        { id: 'oscars', label: 'Premios Oscar' },
+                        { id: 'afi', label: 'Lista AFI' },
+                        { id: 'random', label: 'Sugerencia' },
+                      ].map(tab => (
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-white border-b-2 border-accent' : 'text-slate-500 hover:text-slate-300'}`}>
+                            {tab.label}
                         </button>
                       ))}
                   </div>
-                  <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-400 hover:text-white"><Settings size={20} /></button>
+                  <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-400 hover:text-white transition-colors"><Settings size={20} /></button>
               </nav>
           </div>
       </header>
@@ -218,7 +227,7 @@ function App() {
                     ) : filteredMovies.length === 0 ? (
                         <div className="text-center py-40 opacity-20"><Clapperboard size={80} className="mx-auto mb-4" /><p className="font-black uppercase tracking-widest">No se encontraron películas</p></div>
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-6 mt-12">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-6 gap-y-12 mt-12">
                             {paginatedMovies.map((m, i) => <MovieCard key={`${m.Title}-${i}`} movie={m} apiKeys={apiKeys} />)}
                         </div>
                     )}
@@ -227,53 +236,66 @@ function App() {
 
             {activeTab === 'oscars' && (
                 <div className="space-y-12 animate-in fade-in duration-700">
-                    <div className="glass-panel p-8 rounded-3xl border border-white/5 relative overflow-hidden">
+                    <div className="glass-panel p-8 rounded-3xl border border-white/5 relative overflow-hidden shadow-2xl">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
                              <div className="flex items-center gap-6">
-                                <Trophy size={40} className="text-yellow-500" />
-                                <div><h2 className="text-4xl font-black uppercase text-yellow-500 tracking-tighter">Premios Oscar</h2><p className="text-[10px] text-yellow-500/60 font-black uppercase tracking-widest mt-1">Archivo de la Academia</p></div>
+                                <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
+                                    <Trophy size={32} className="text-yellow-500" />
+                                </div>
+                                <div><h2 className="text-4xl font-black uppercase text-yellow-500 tracking-tighter leading-none">Premios Oscar</h2><p className="text-[10px] text-yellow-500/60 font-black uppercase tracking-[0.2em] mt-2">Archivo Histórico de la Academia</p></div>
                             </div>
-                            <div className="flex items-center gap-4 bg-black/40 p-2 rounded-2xl border border-white/5">
-                                <button onClick={() => setOscarYear(oscarYear - 1)} className="p-3 hover:bg-white/5 rounded-xl">Ant</button>
-                                <div className="px-10 py-3 bg-yellow-500 text-black rounded-xl font-black text-3xl shadow-2xl">{oscarYear}</div>
-                                <button onClick={() => setOscarYear(oscarYear + 1)} className="p-3 hover:bg-white/5 rounded-xl">Sig</button>
+                            <div className="flex items-center gap-4 bg-black/40 p-2 rounded-2xl border border-white/5 shadow-xl">
+                                <button onClick={() => setOscarYear(oscarYear - 1)} className="p-3 hover:bg-white/5 rounded-xl transition-colors">Ant</button>
+                                <div className="px-12 py-3 bg-yellow-500 text-black rounded-xl font-black text-3xl shadow-lg">{oscarYear}</div>
+                                <button onClick={() => setOscarYear(oscarYear + 1)} className="p-3 hover:bg-white/5 rounded-xl transition-colors">Sig</button>
                             </div>
                         </div>
-                        <div className="flex overflow-x-auto gap-2 pb-4 no-scrollbar">
+                        <div className="flex overflow-x-auto gap-2 pb-4 no-scrollbar scroll-smooth">
                             {availableOscarYears.map(y => (
-                                <button key={y} onClick={() => setOscarYear(y)} className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${oscarYear === y ? 'bg-yellow-500 text-black shadow-lg' : 'bg-white/5 text-slate-500 hover:text-white'}`}>{y}</button>
+                                <button key={y} onClick={() => setOscarYear(y)} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${oscarYear === y ? 'bg-yellow-500 text-black shadow-xl' : 'bg-white/5 text-slate-500 hover:text-white hover:bg-white/10'}`}>{y}</button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="space-y-16">
+                    <div className="space-y-20">
                         {oscarDisplayData.map(([cat, items]) => (
-                            <div key={cat}>
-                                <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mb-6 border-l-4 border-yellow-500 pl-4">{cat}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {items.map((o, i) => <OscarCard key={`${cat}-${i}`} item={o} apiKeys={apiKeys} />)}
+                            <div key={cat} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-8 border-l-4 border-yellow-500 pl-4 bg-gradient-to-r from-yellow-500/5 to-transparent py-2">{cat}</h3>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-6 gap-y-12">
+                                    {items.map((o, i) => (
+                                        <div key={`${cat}-${i}`} className="scale-100">
+                                            <OscarCard item={o} apiKeys={apiKeys} />
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         ))}
                     </div>
 
                     {oscarLeaderboard.length > 0 && (
-                        <div className="mt-20 pt-12 border-t border-white/5">
-                             <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-8 flex items-center gap-4"><List className="text-yellow-500" /> Ranking y Desglose por Película</h3>
-                             <div className="flex flex-col lg:flex-row gap-8 h-[600px]">
-                                 <div className="lg:w-1/3 glass-panel rounded-2xl border border-white/5 overflow-y-auto custom-scrollbar p-2">
+                        <div className="mt-32 pt-16 border-t border-white/5">
+                             <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-12 flex items-center gap-4"><List className="text-yellow-500" /> Ranking y Desglose por Película</h3>
+                             <div className="flex flex-col lg:flex-row gap-8 h-[650px]">
+                                 <div className="lg:w-1/3 glass-panel rounded-2xl border border-white/5 overflow-y-auto custom-scrollbar p-3 space-y-2 bg-black/20">
                                      {oscarLeaderboard.map((m) => (
-                                         <button key={m.title} onClick={() => setSelectedOscarMovieTitle(m.title)} className={`w-full flex items-center justify-between p-4 rounded-xl transition-all mb-1 ${selectedOscarMovieTitle === m.title ? 'bg-accent/20 border border-accent/40 shadow-xl' : 'hover:bg-white/5'}`}>
-                                             <div className="flex items-center gap-3 truncate pr-2">
+                                         <button key={m.title} onClick={() => setSelectedOscarMovieTitle(m.title)} className={`w-full flex items-center justify-between p-4 rounded-xl transition-all border ${selectedOscarMovieTitle === m.title ? 'bg-yellow-500/10 border-yellow-500/40 shadow-xl' : 'bg-transparent border-transparent hover:bg-white/5'}`}>
+                                             <div className="flex items-center gap-4 truncate pr-2">
                                                  {m.isWinner && <Trophy size={14} className="text-yellow-500 shrink-0" />}
-                                                 <span className="text-xs font-bold truncate">{m.title}</span>
+                                                 <span className={`text-[11px] font-black uppercase tracking-wide truncate ${selectedOscarMovieTitle === m.title ? 'text-white' : 'text-slate-400'}`}>{m.title}</span>
                                              </div>
-                                             <div className="flex gap-4"><span className="text-xs font-black text-yellow-500">{m.wins}W</span><span className="text-xs font-bold text-slate-500">{m.noms}N</span></div>
+                                             <div className="flex gap-4 shrink-0"><span className="text-[10px] font-black text-yellow-500">{m.wins}W</span><span className="text-[10px] font-black text-slate-600">{m.noms}N</span></div>
                                          </button>
                                      ))}
                                  </div>
                                  <div className="lg:w-2/3 h-full">
-                                     {selectedOscarMovieTitle ? <OscarMovieSummary title={selectedOscarMovieTitle} year={oscarYear} oscarData={oscarData} apiKeys={apiKeys} movies={movies} /> : <div className="h-full glass-panel rounded-2xl border border-white/5 flex flex-col items-center justify-center opacity-40 italic text-sm">Selecciona una película de la lista para ver el detalle</div>}
+                                     {selectedOscarMovieTitle ? (
+                                         <OscarMovieSummary title={selectedOscarMovieTitle} year={oscarYear} oscarData={oscarData} apiKeys={apiKeys} movies={movies} />
+                                     ) : (
+                                         <div className="h-full glass-panel rounded-2xl border border-white/5 flex flex-col items-center justify-center opacity-40 italic text-sm text-center p-12">
+                                             <Play size={48} className="mb-6 opacity-20" />
+                                             <p className="uppercase tracking-[0.2em] font-black text-xs">Selecciona una película de la lista para ver el desglose de sus premios</p>
+                                         </div>
+                                     )}
                                  </div>
                              </div>
                         </div>
@@ -282,15 +304,45 @@ function App() {
             )}
 
             {activeTab === 'afi' && (
-                 <div className="animate-in fade-in duration-700 max-w-6xl mx-auto space-y-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-2">Lista AFI</h2>
-                        <p className="text-accent font-black uppercase tracking-[0.4em] text-xs">100 Years... 100 Movies</p>
+                 <div className="animate-in fade-in duration-700 max-w-6xl mx-auto space-y-12">
+                    <div className="text-center mb-20">
+                        <h2 className="text-6xl font-black uppercase italic tracking-tighter mb-4 bg-gradient-to-b from-white to-slate-500 bg-clip-text text-transparent leading-none">Lista AFI</h2>
+                        <p className="text-accent font-black uppercase tracking-[0.6em] text-[10px]">100 Years... 100 Movies (10th Anniversary)</p>
                     </div>
-                    <div className="grid grid-cols-1 gap-6">
-                        {AFI_LIST.map(a => <AFICard key={a.Rank} rank={a.Rank} title={a.Title} year={a.Year} movie={movies.find(m => m.NormTitle === normalizeTitle(a.Title)) || null} apiKeys={apiKeys} />)}
+                    <div className="grid grid-cols-1 gap-8">
+                        {AFI_LIST.map(a => (
+                            <AFICard 
+                                key={a.Rank} 
+                                rank={a.Rank} 
+                                title={a.Title} 
+                                year={a.Year} 
+                                movie={movies.find(m => m.NormTitle === normalizeTitle(a.Title))} 
+                                apiKeys={apiKeys} 
+                            />
+                        ))}
                     </div>
                  </div>
+            )}
+
+            {activeTab === 'analysis' && (
+                <AnalysisView movies={filteredMovies} oscarData={oscarData} />
+            )}
+
+            {activeTab === 'random' && (
+                <div className="flex flex-col items-center justify-center py-40 text-center animate-in fade-in duration-700">
+                    <Dice5 size={64} className="text-accent mb-8 animate-bounce" />
+                    <h2 className="text-3xl font-black uppercase tracking-widest text-white mb-4">¿No sabes qué ver?</h2>
+                    <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mb-12">Deja que el destino decida la próxima función</p>
+                    <button 
+                        onClick={() => {
+                            const rand = filteredMovies[Math.floor(Math.random() * filteredMovies.length)];
+                            if (rand) alert(`Sugerencia: ${rand.Title} (${rand.Year})`);
+                        }}
+                        className="px-12 py-4 bg-accent text-black font-black uppercase tracking-[0.4em] text-[10px] rounded-full shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:scale-110 transition-transform"
+                    >
+                        Lanzar Proyector
+                    </button>
+                </div>
             )}
       </main>
     </div>
