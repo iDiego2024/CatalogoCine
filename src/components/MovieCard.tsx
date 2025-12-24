@@ -52,22 +52,18 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
             </div>
         )}
         
-        {/* Cinematic Gradient Overlay (Always visible but stronger on hover) */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
         
-        {/* Top Badges */}
         <div className="absolute top-0 left-0 p-2 flex gap-1 flex-wrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -translate-y-2 group-hover:translate-y-0">
             {awards?.oscars ? <span className="bg-yellow-500 text-black text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-wide shadow-lg shadow-yellow-500/20">🏆 {awards.oscars}</span> : null}
             {awards?.palme_dor ? <span className="bg-green-600 text-white text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-wide shadow-lg">🌿 Palma</span> : null}
         </div>
       </div>
 
-      {/* Content Slide-up on Hover */}
       <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
         <h3 className="font-bold text-white text-sm leading-tight mb-1 text-glow drop-shadow-md line-clamp-2">{movie.Title}</h3>
         <div className="text-[10px] font-bold text-slate-400 mb-2">{movie.Year}</div>
         
-        {/* Ratings - visible on hover primarily, or simplified */}
         <div className="flex items-center gap-3 text-xs mb-3 opacity-80 group-hover:opacity-100 transition-opacity">
             {movie["Your Rating"] && (
                 <div className={`flex items-center gap-1 font-black ${colors.text}`}>
@@ -76,19 +72,17 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
             )}
             {movie["IMDb Rating"] && (
                 <a href={movie.URL} target="_blank" rel="noreferrer" className="text-slate-400 flex items-center gap-1 hover:text-white transition-colors group/imdb">
-                   <span className="font-bold text-yellow-500/80 text-[10px] border border-yellow-500/30 px-1 rounded group-hover/imdb:border-yellow-500">IMDb</span> {movie["IMDb Rating"]}
+                   <span className="font-bold text-yellow-500/80 text-[10px] border border-yellow-500/30 px-1 rounded group-hover/imdb:border-yellow-500 transition-colors">IMDb</span> {movie["IMDb Rating"]}
                 </a>
             )}
         </div>
 
-        {/* Detailed Info (Revealed on Hover) */}
         <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100">
             <div className="text-[10px] text-slate-300 space-y-1 mb-3 pt-2 border-t border-white/10">
                 <p className="line-clamp-1"><span className="text-slate-500 uppercase tracking-wider text-[9px]">Gén:</span> {movie.Genres}</p>
                 <p className="line-clamp-1"><span className="text-slate-500 uppercase tracking-wider text-[9px]">Dir:</span> {movie.Directors}</p>
             </div>
 
-            {/* Links */}
             <div className="grid grid-cols-4 gap-1 text-[9px] uppercase tracking-wide font-bold mt-2">
                  {movie.URL && (
                      <a href={movie.URL} target="_blank" rel="noreferrer" className="col-span-1 flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-300 hover:text-white transition-colors">
@@ -110,7 +104,6 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
         </div>
       </div>
       
-      {/* Active Selection Glow */}
       <div className="absolute inset-0 border-2 border-transparent group-hover:border-white/10 rounded-lg pointer-events-none transition-colors duration-300"></div>
     </div>
   );

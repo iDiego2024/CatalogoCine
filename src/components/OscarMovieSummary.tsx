@@ -113,7 +113,7 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
                             )}
                             {displayImdb && (
                                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex flex-col items-center text-slate-300 hover:text-white transition-colors group/imdb">
-                                    <span className="text-xl font-black flex items-center gap-1"><span className="text-yellow-500 font-serif font-bold text-xs border border-yellow-500 px-1 rounded-sm group-hover/imdb:border-yellow-400">IMDb</span> {displayImdb}</span>
+                                    <span className="text-xl font-black flex items-center gap-1"><span className="text-yellow-500 font-serif font-bold text-xs border border-yellow-500 px-1 rounded-sm group-hover/imdb:border-yellow-400 transition-colors">IMDb</span> {displayImdb}</span>
                                     <span className="text-[9px] uppercase opacity-60 font-bold text-slate-500">Global</span>
                                 </a>
                             )}

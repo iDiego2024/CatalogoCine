@@ -85,7 +85,7 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
             )}
             {omdbData?.imdbRating && (
                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="text-slate-500 flex items-center gap-0.5 hover:text-white transition-colors group/imdb">
-                   <span className="text-[7px] border border-yellow-500/30 px-0.5 rounded text-yellow-500 font-bold group-hover/imdb:border-yellow-500">IMDb</span> {omdbData.imdbRating}
+                   <span className="text-[7px] border border-yellow-500/30 px-0.5 rounded text-yellow-500 font-bold group-hover/imdb:border-yellow-500 transition-colors">IMDb</span> {omdbData.imdbRating}
                 </a>
             )}
         </div>

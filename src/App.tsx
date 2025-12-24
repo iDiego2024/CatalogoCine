@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Movie, FilterState, ApiKeys, OscarRow } from './types';
 import { parseMoviesCSV, parseOscarExcel, normalizeTitle } from './utils';
 import { AFI_LIST } from './constants';
@@ -140,6 +140,9 @@ function App() {
       return Object.values(statsMap).sort((a: any, b: any) => b.wins !== a.wins ? b.wins - a.wins : b.noms - a.noms);
   }, [oscarFiltered, oscarYear]);
 
+  // Clase de grid unificada para coherencia en todo el sitio
+  const GRID_CLASS = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-6 gap-y-12";
+
   return (
     <div className="min-h-screen text-slate-200 font-sans flex flex-col relative">
       <div className="bg-cinematic"></div>
@@ -197,7 +200,7 @@ function App() {
                         </button>
                       ))}
                   </div>
-                  <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-400 hover:text-white"><Settings size={20} /></button>
+                  <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-400 hover:text-white transition-colors"><Settings size={20} /></button>
               </nav>
           </div>
       </header>
@@ -211,7 +214,7 @@ function App() {
                     ) : filteredMovies.length === 0 ? (
                         <div className="text-center py-40 opacity-20"><Clapperboard size={80} className="mx-auto mb-4" /><p className="font-black uppercase tracking-widest">No se encontraron películas</p></div>
                     ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-6 gap-y-12 mt-12">
+                        <div className={GRID_CLASS}>
                             {paginatedMovies.map((m, i) => <MovieCard key={`${m.Title}-${i}`} movie={m} apiKeys={apiKeys} />)}
                         </div>
                     )}
@@ -245,8 +248,7 @@ function App() {
                         {oscarDisplayData.map(([cat, items]) => (
                             <div key={cat} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-8 border-l-4 border-yellow-500 pl-4 bg-gradient-to-r from-yellow-500/5 to-transparent py-2">{cat}</h3>
-                                {/* Grid ajustada para posters más pequeños y ordenados */}
-                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-x-4 gap-y-10">
+                                <div className={GRID_CLASS}>
                                     {items.map((o, i) => (
                                         <OscarCard key={`${cat}-${i}`} item={o} apiKeys={apiKeys} />
                                     ))}

@@ -41,8 +41,8 @@ const AFICard: React.FC<AFICardProps> = ({ rank, title, year, movie, apiKeys }) 
               {movie && (
                   <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-accent mb-6">
                       <div className="flex items-center gap-1.5"><Star size={14} fill="currentColor" /> Mi Nota: {movie["Your Rating"] ?? "—"}</div>
-                      <a href={movie.URL} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors">
-                        IMDb: {movie["IMDb Rating"] ?? "—"}
+                      <a href={movie.URL} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors flex items-center gap-1 group/imdb">
+                        <span className="text-yellow-500 font-bold border border-yellow-500/30 px-1 rounded text-[10px] group-hover/imdb:border-yellow-500 transition-colors">IMDb</span> {movie["IMDb Rating"] ?? "—"}
                       </a>
                   </div>
               )}
