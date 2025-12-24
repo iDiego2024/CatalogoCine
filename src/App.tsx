@@ -208,7 +208,7 @@ function App() {
       <main className="max-w-[1920px] mx-auto p-4 lg:p-8 w-full flex-1 relative z-10">
             {activeTab === 'catalog' && (
                 <div className="animate-in fade-in duration-700">
-                    <FilterBar filters={filters} setFilters={setFilters} availableGenres={availableGenres} availableDirectors={availableDirectors} />
+                    <FilterBar filters={filters} setFilters={setFilters} availableGenres={availableGenres} availableDirectors={availableDirectors} movies={movies} />
                     {isDataLoading && movies.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-40"><Loader2 size={48} className="animate-spin text-accent mb-4" /><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Iniciando Función...</p></div>
                     ) : filteredMovies.length === 0 ? (

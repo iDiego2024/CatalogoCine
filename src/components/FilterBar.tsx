@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FilterState } from '../types';
+import React, { useState, useMemo } from 'react';
+import { FilterState, Movie } from '../types';
 import { ChevronDown, Calendar, Star, Film, Megaphone, X, Check, Trash2 } from 'lucide-react';
 
 interface FilterBarProps {
@@ -7,10 +7,11 @@ interface FilterBarProps {
   setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
   availableGenres: string[];
   availableDirectors: string[];
+  movies: Movie[]; // New prop to calculate decade counts
 }
 
 const FilterBar = ({
-  filters, setFilters, availableGenres, availableDirectors
+  filters, setFilters, availableGenres, availableDirectors, movies
 }: FilterBarProps) => {
   const [activePopover, setActivePopover] = useState<'year' | 'rating' | 'genres' | 'directors' | null>(null);
 
@@ -23,6 +24,31 @@ const FilterBar = ({
       const endYear = startYear === 1900 ? 1919 : startYear + 9;
       setFilters(prev => ({ ...prev, yearRange: [startYear, endYear] }));
   };
+
+  const decadeCounts = useMemo(() => {
+    const counts: Record<number, number> = {};
+    const decadeStarts = [2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920, 1900];
+    
+    decadeStarts.forEach(start => counts[start] = 0);
+    
+    movies.forEach(m => {
+        if (!m.Year) return;
+        if (m.Year >= 2020) counts[2020]++;
+        else if (m.Year >= 2010) counts[2010]++;
+        else if (m.Year >= 2000) counts[2000]++;
+        else if (m.Year >= 1990) counts[1990]++;
+        else if (m.Year >= 1980) counts[1980]++;
+        else if (m.Year >= 1970) counts[1970]++;
+        else if (m.Year >= 1960) counts[1960]++;
+        else if (m.Year >= 1950) counts[1950]++;
+        else if (m.Year >= 1940) counts[1940]++;
+        else if (m.Year >= 1930) counts[1930]++;
+        else if (m.Year >= 1920) counts[1920]++;
+        else if (m.Year >= 1900) counts[1900]++;
+    });
+    
+    return counts;
+  }, [movies]);
 
   const setRatingBound = (bound: 'min' | 'max', value: number) => {
       setFilters(prev => {
@@ -199,20 +225,26 @@ const FilterBar = ({
             </div>
             
             <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-4 px-2 no-scrollbar scroll-smooth">
-                {[2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920, 1900].map(decade => (
-                    <button
-                        key={decade}
-                        onClick={() => setDecade(decade)}
-                        className={`
-                            shrink-0 px-8 py-3 rounded-md text-[11px] font-black tracking-[0.2em] uppercase transition-all duration-500 border-x border-white/5 relative
-                            ${filters.yearRange[0] === decade && filters.yearRange[1] === (decade === 1900 ? 1919 : decade + 9)
-                                ? 'bg-accent text-black shadow-[0_0_30px_rgba(234,179,8,0.4)] scale-110 z-10' 
-                                : 'bg-zinc-900/60 text-slate-500 hover:text-slate-100 hover:bg-zinc-800'}
-                        `}
-                    >
-                        {decade === 1900 ? 'CLÁSICOS' : `${decade}S`}
-                    </button>
-                ))}
+                {[2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920, 1900].map(decade => {
+                    const isSelected = filters.yearRange[0] === decade && filters.yearRange[1] === (decade === 1900 ? 1919 : decade + 9);
+                    return (
+                        <button
+                            key={decade}
+                            onClick={() => setDecade(decade)}
+                            className={`
+                                shrink-0 px-8 py-3 rounded-md text-[11px] font-black tracking-[0.2em] uppercase transition-all duration-500 border-x border-white/5 relative flex flex-col items-center gap-1
+                                ${isSelected
+                                    ? 'bg-accent text-black shadow-[0_0_30px_rgba(234,179,8,0.4)] scale-110 z-10' 
+                                    : 'bg-zinc-900/60 text-slate-500 hover:text-slate-100 hover:bg-zinc-800'}
+                            `}
+                        >
+                            <span>{decade === 1900 ? 'CLÁSICOS' : `${decade}S`}</span>
+                            <span className={`text-[9px] font-mono ${isSelected ? 'opacity-80' : 'opacity-40'}`}>
+                                ({decadeCounts[decade] || 0})
+                            </span>
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Perforaciones inferiores */}
