@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Movie, FilterState, ApiKeys, OscarRow } from './types';
 import { parseMoviesCSV, parseOscarExcel, normalizeTitle } from './utils';
 import { AFI_LIST } from './constants';
@@ -41,7 +41,6 @@ function App() {
 
   const [apiKeys] = useState<ApiKeys>(DEFAULT_API_KEYS);
 
-  // Carga de datos desde servidor
   useEffect(() => {
     const loadData = async () => {
         setIsDataLoading(true);
@@ -70,24 +69,9 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Sincronizar filtros al detectar películas
-  useEffect(() => {
-    if (movies.length > 0) {
-      const years = movies.map(m => m.Year).filter((y): y is number => y !== null && y > 1800);
-      if (years.length > 0) {
-        setFilters(prev => ({
-          ...prev,
-          yearRange: [Math.min(...years), Math.max(...years)]
-        }));
-      }
-    }
-  }, [movies]);
-
-  // Fix: Adding missing memoized values for available genres and directors
   const availableGenres = useMemo(() => Array.from(new Set(movies.flatMap(m => m.GenreList))).sort(), [movies]);
   const availableDirectors = useMemo(() => Array.from(new Set(movies.flatMap(m => m.Directors.split(',').map(d => d.trim()).filter(Boolean)))).sort(), [movies]);
 
-  // Filtrado y Búsqueda
   useEffect(() => {
     let result = movies.filter(m => {
         const y = m.Year || 0;
@@ -213,7 +197,7 @@ function App() {
                         </button>
                       ))}
                   </div>
-                  <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-400 hover:text-white transition-colors"><Settings size={20} /></button>
+                  <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-400 hover:text-white"><Settings size={20} /></button>
               </nav>
           </div>
       </header>
@@ -261,11 +245,10 @@ function App() {
                         {oscarDisplayData.map(([cat, items]) => (
                             <div key={cat} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-8 border-l-4 border-yellow-500 pl-4 bg-gradient-to-r from-yellow-500/5 to-transparent py-2">{cat}</h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-6 gap-y-12">
+                                {/* Grid ajustada para posters más pequeños y ordenados */}
+                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-x-4 gap-y-10">
                                     {items.map((o, i) => (
-                                        <div key={`${cat}-${i}`} className="scale-100">
-                                            <OscarCard item={o} apiKeys={apiKeys} />
-                                        </div>
+                                        <OscarCard key={`${cat}-${i}`} item={o} apiKeys={apiKeys} />
                                     ))}
                                 </div>
                             </div>
@@ -324,26 +307,7 @@ function App() {
                  </div>
             )}
 
-            {activeTab === 'analysis' && (
-                <AnalysisView movies={filteredMovies} oscarData={oscarData} />
-            )}
-
-            {activeTab === 'random' && (
-                <div className="flex flex-col items-center justify-center py-40 text-center animate-in fade-in duration-700">
-                    <Dice5 size={64} className="text-accent mb-8 animate-bounce" />
-                    <h2 className="text-3xl font-black uppercase tracking-widest text-white mb-4">¿No sabes qué ver?</h2>
-                    <p className="text-slate-500 text-xs font-black uppercase tracking-[0.3em] mb-12">Deja que el destino decida la próxima función</p>
-                    <button 
-                        onClick={() => {
-                            const rand = filteredMovies[Math.floor(Math.random() * filteredMovies.length)];
-                            if (rand) alert(`Sugerencia: ${rand.Title} (${rand.Year})`);
-                        }}
-                        className="px-12 py-4 bg-accent text-black font-black uppercase tracking-[0.4em] text-[10px] rounded-full shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:scale-110 transition-transform"
-                    >
-                        Lanzar Proyector
-                    </button>
-                </div>
-            )}
+            {activeTab === 'analysis' && <AnalysisView movies={movies} oscarData={oscarData} />}
       </main>
     </div>
   );

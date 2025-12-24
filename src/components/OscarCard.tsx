@@ -56,14 +56,14 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
         
         {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1 z-20">
+        <div className="absolute top-1.5 left-1.5 flex flex-col gap-1 z-20">
             {item.IsWinner && (
-                <div className="bg-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded shadow-lg flex items-center gap-1 uppercase tracking-wider">
+                <div className="bg-yellow-500 text-black text-[8px] font-black px-1.5 py-0.5 rounded shadow-lg flex items-center gap-1 uppercase tracking-wider">
                     <Trophy size={8} fill="black" /> Won
                 </div>
             )}
             {item.InMyCatalog && (
-                <div className="bg-green-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow-lg flex items-center gap-1 uppercase tracking-wider">
+                <div className="bg-green-500 text-white text-[7px] font-black px-1 py-0.5 rounded shadow-lg flex items-center gap-1 uppercase tracking-wider">
                     <CheckCircle2 size={8} /> Visto
                 </div>
             )}
@@ -71,38 +71,36 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
       </div>
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-        <h4 className="font-bold text-white text-[11px] leading-tight mb-0.5 text-glow truncate" title={item.Film}>{item.Film}</h4>
-        <div className="text-[9px] font-bold text-slate-500 mb-2">{item.FilmYear}</div>
+      <div className="absolute bottom-0 left-0 right-0 p-2.5 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
+        <h4 className="font-bold text-white text-[10px] leading-tight mb-0.5 text-glow truncate" title={item.Film}>{item.Film}</h4>
+        <div className="text-[8px] font-bold text-slate-500 mb-1.5">{item.FilmYear}</div>
         
         {/* Ratings */}
-        <div className="flex items-center gap-2 text-[10px] mb-2">
+        <div className="flex items-center gap-1.5 text-[9px] mb-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {item.MyRating !== null && item.MyRating !== undefined && (
                 <div className={`flex items-center gap-0.5 font-black ${colors.text}`}>
-                    <Star size={10} fill="currentColor" /> {item.MyRating}
+                    <Star size={8} fill="currentColor" /> {item.MyRating}
                 </div>
             )}
             {omdbData?.imdbRating && (
                 <div className="text-slate-500 flex items-center gap-0.5">
-                   <span className="text-[8px] border border-yellow-500/30 px-0.5 rounded text-yellow-500 font-bold">IMDb</span> {omdbData.imdbRating}
+                   <span className="text-[7px] border border-yellow-500/30 px-0.5 rounded text-yellow-500 font-bold">IMDb</span> {omdbData.imdbRating}
                 </div>
             )}
         </div>
 
         {/* Links Overlay */}
-        <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100 border-t border-white/10 pt-2 mt-1">
-            <div className="grid grid-cols-2 gap-2">
+        <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100 border-t border-white/10 pt-1.5 mt-0.5">
+            <div className="grid grid-cols-2 gap-1.5">
                  <a href={trailerUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1 bg-red-500/10 hover:bg-red-500/20 rounded text-red-500 transition-colors" title="Trailer">
-                    <Youtube size={12} />
+                    <Youtube size={10} />
                  </a>
                  <a href={`https://www.google.com/search?q=${encodeURIComponent(item.Film + " " + item.FilmYear + " movie")}`} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1 bg-white/10 hover:bg-white/20 rounded text-slate-400 transition-colors">
-                    <BookOpen size={12} />
+                    <BookOpen size={10} />
                  </a>
             </div>
         </div>
       </div>
-      
-      <div className={`absolute inset-0 border-2 ${item.IsWinner ? 'border-yellow-500/20' : 'border-transparent'} group-hover:border-white/10 rounded-lg pointer-events-none transition-colors duration-300`}></div>
     </div>
   );
 };
