@@ -75,9 +75,9 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
                 </div>
             )}
             {movie["IMDb Rating"] && (
-                <div className="text-slate-400 flex items-center gap-1">
-                   <span className="font-bold text-yellow-500/80 text-[10px] border border-yellow-500/30 px-1 rounded">IMDb</span> {movie["IMDb Rating"]}
-                </div>
+                <a href={movie.URL} target="_blank" rel="noreferrer" className="text-slate-400 flex items-center gap-1 hover:text-white transition-colors group/imdb">
+                   <span className="font-bold text-yellow-500/80 text-[10px] border border-yellow-500/30 px-1 rounded group-hover/imdb:border-yellow-500">IMDb</span> {movie["IMDb Rating"]}
+                </a>
             )}
         </div>
 

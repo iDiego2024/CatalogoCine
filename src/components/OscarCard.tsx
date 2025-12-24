@@ -39,6 +39,7 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
 
   const rating = item.MyRating ?? (omdbData?.imdbRating ? parseFloat(omdbData.imdbRating) : null);
   const colors = getRatingColors(rating);
+  const imdbUrl = item.CatalogURL || `https://www.imdb.com/find?q=${encodeURIComponent(item.Film + " " + item.FilmYear)}`;
 
   return (
     <div className={`group relative bg-[#050505] rounded-lg overflow-hidden transition-all duration-500 hover:z-20 hover:scale-105 hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] border ${item.IsWinner ? 'border-yellow-500/30' : 'border-white/5'} hover:border-white/20`}>
@@ -83,9 +84,9 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
                 </div>
             )}
             {omdbData?.imdbRating && (
-                <div className="text-slate-500 flex items-center gap-0.5">
-                   <span className="text-[7px] border border-yellow-500/30 px-0.5 rounded text-yellow-500 font-bold">IMDb</span> {omdbData.imdbRating}
-                </div>
+                <a href={imdbUrl} target="_blank" rel="noreferrer" className="text-slate-500 flex items-center gap-0.5 hover:text-white transition-colors group/imdb">
+                   <span className="text-[7px] border border-yellow-500/30 px-0.5 rounded text-yellow-500 font-bold group-hover/imdb:border-yellow-500">IMDb</span> {omdbData.imdbRating}
+                </a>
             )}
         </div>
 
