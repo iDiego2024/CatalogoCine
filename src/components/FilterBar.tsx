@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FilterState } from '../types';
-import { ChevronDown, Calendar, Star, Film, Megaphone, X, Check, Filter, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, Calendar, Star, Film, Megaphone, X, Check, Trash2 } from 'lucide-react';
 
 interface FilterBarProps {
   filters: FilterState;
@@ -19,6 +19,7 @@ const FilterBar = ({
   };
 
   const setDecade = (startYear: number) => {
+      // Si es Clásico (1900), abarcamos hasta 1919. Si no, tramo de 10 años.
       const endYear = startYear === 1900 ? 1919 : startYear + 9;
       setFilters(prev => ({ ...prev, yearRange: [startYear, endYear] }));
   };
@@ -57,28 +58,18 @@ const FilterBar = ({
     });
   };
 
-  const removeTag = (type: 'genres' | 'directors' | 'year' | 'rating', val?: string) => {
-      if (type === 'genres' || type === 'directors') {
-          if (val) toggleSelection(type, val);
-      } else if (type === 'year') {
-          setFilters(prev => ({ ...prev, yearRange: [1900, new Date().getFullYear()] }));
-      } else if (type === 'rating') {
-          setFilters(prev => ({ ...prev, ratingRange: [0, 10] }));
-      }
-  };
-
   const clearFilters = () => {
       setFilters(prev => ({
           ...prev,
           genres: [],
           directors: [],
-          yearRange: [1900, new Date().getFullYear()],
+          yearRange: [1900, 2025],
           ratingRange: [0, 10]
       }));
       setActivePopover(null);
   };
 
-  const isYearActive = filters.yearRange[0] > 1900 || filters.yearRange[1] < new Date().getFullYear();
+  const isYearActive = filters.yearRange[0] > 1900 || filters.yearRange[1] < 2024;
   const isRatingActive = filters.ratingRange[0] > 0 || filters.ratingRange[1] < 10;
   const hasActiveFilters = filters.genres.length > 0 || filters.directors.length > 0 || isYearActive || isRatingActive;
 
@@ -87,42 +78,42 @@ const FilterBar = ({
       <button 
         onClick={() => togglePopover(id as any)}
         className={`
-            group flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all duration-300
+            group flex items-center gap-2 px-5 py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-[0.1em] transition-all duration-300
             ${active 
-                ? 'bg-[#0f172a] border-accent text-accent shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
+                ? 'bg-slate-900 border-accent text-accent shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
                 : isFiltered 
                     ? 'bg-accent/10 border-accent/40 text-accent hover:bg-accent/20'
                     : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200 hover:border-white/20'
             }
         `}
       >
-        <Icon size={14} className={isFiltered || active ? 'text-accent' : 'text-slate-500 group-hover:text-slate-300'} />
+        <Icon size={14} className={isFiltered || active ? 'text-accent' : 'text-slate-500 transition-colors'} />
         {label}
-        {count ? <span className="ml-1 bg-accent text-black px-1.5 rounded-full text-[9px] font-black">{count}</span> : null}
+        {count ? <span className="ml-1 bg-accent text-black px-1.5 rounded-full text-[8px] font-black">{count}</span> : null}
         <ChevronDown size={12} className={`transition-transform duration-300 opacity-50 ${active ? 'rotate-180' : ''}`} />
       </button>
 
       {active && (
-        <div className="absolute top-full mt-2 left-0 z-50 min-w-[340px] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
-           <div className="mb-4 flex justify-between items-center border-b border-white/5 pb-2">
-             <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <Icon size={12}/> {label}
+        <div className="absolute top-full mt-3 left-0 z-50 min-w-[340px] bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
+           <div className="mb-6 flex justify-between items-center border-b border-white/5 pb-3">
+             <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Icon size={14}/> {label}
              </span>
-             <button onClick={() => setActivePopover(null)} className="p-1 hover:bg-white/10 rounded-full transition-colors"><X size={14} className="text-slate-500 hover:text-white" /></button>
+             <button onClick={() => setActivePopover(null)} className="p-1 hover:bg-white/10 rounded-full text-slate-500 hover:text-white"><X size={16} /></button>
            </div>
            
            {id === 'year' && (
               <div className="space-y-4">
                   <div className="flex items-center gap-3">
                       <div className="flex-1">
-                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Desde</label>
+                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1.5 block">Desde</label>
                           <input type="number" value={filters.yearRange[0]} onChange={e => handleRangeChange('year', 0, e.target.value)} 
-                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" placeholder="1900" />
+                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-center text-sm font-mono focus:border-accent outline-none text-white transition-colors" />
                       </div>
                       <div className="flex-1">
-                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Hasta</label>
+                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1.5 block">Hasta</label>
                           <input type="number" value={filters.yearRange[1]} onChange={e => handleRangeChange('year', 1, e.target.value)} 
-                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" placeholder="2024" />
+                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-center text-sm font-mono focus:border-accent outline-none text-white transition-colors" />
                       </div>
                   </div>
               </div>
@@ -131,16 +122,16 @@ const FilterBar = ({
            {id === 'rating' && (
               <div className="space-y-6">
                   <div>
-                      <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Mínima</label>
-                      <div className="flex gap-1">
+                      <label className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-3 block">Puntuación Mínima</label>
+                      <div className="flex gap-1.5">
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
                               <button 
                                 key={`min-${r}`}
                                 onClick={() => setRatingBound('min', r)}
-                                className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
+                                className={`flex-1 aspect-square rounded-lg flex items-center justify-center text-xs font-black transition-all ${
                                     filters.ratingRange[0] === r 
-                                    ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110 z-10' 
-                                    : 'bg-white/5 text-slate-300 hover:bg-white/20'
+                                    ? 'bg-accent text-black shadow-[0_0_15px_rgba(234,179,8,0.4)] scale-110' 
+                                    : 'bg-white/5 text-slate-400 hover:bg-white/15'
                                 }`}
                               >
                                   {r}
@@ -149,16 +140,16 @@ const FilterBar = ({
                       </div>
                   </div>
                   <div>
-                      <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Máxima</label>
-                      <div className="flex gap-1">
+                      <label className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-3 block">Puntuación Máxima</label>
+                      <div className="flex gap-1.5">
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
                               <button 
                                 key={`max-${r}`}
                                 onClick={() => setRatingBound('max', r)}
-                                className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
+                                className={`flex-1 aspect-square rounded-lg flex items-center justify-center text-xs font-black transition-all ${
                                     filters.ratingRange[1] === r 
-                                    ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110 z-10' 
-                                    : 'bg-white/5 text-slate-300 hover:bg-white/20'
+                                    ? 'bg-accent text-black shadow-[0_0_15px_rgba(234,179,8,0.4)] scale-110' 
+                                    : 'bg-white/5 text-slate-400 hover:bg-white/15'
                                 }`}
                               >
                                   {r}
@@ -170,10 +161,10 @@ const FilterBar = ({
            )}
 
            {id === 'genres' && (
-              <div className="flex flex-wrap gap-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+              <div className="flex flex-wrap gap-2 max-h-64 overflow-y-auto custom-scrollbar pr-2">
                   {availableGenres.map(g => (
                       <button key={g} onClick={() => toggleSelection('genres', g)}
-                          className={`text-[11px] px-3 py-1.5 rounded-lg border transition-all duration-200 ${filters.genres.includes(g) ? 'bg-accent text-black border-accent font-bold shadow-lg shadow-accent/20' : 'bg-white/5 border-white/5 text-slate-400 hover:border-white/20 hover:text-white'}`}>
+                          className={`text-[10px] px-3 py-2 rounded-lg border transition-all ${filters.genres.includes(g) ? 'bg-accent text-black border-accent font-black' : 'bg-white/5 border-white/5 text-slate-400 hover:border-white/20'}`}>
                           {g}
                       </button>
                   ))}
@@ -181,14 +172,13 @@ const FilterBar = ({
            )}
 
             {id === 'directors' && (
-              <div className="space-y-2">
-                 <input type="text" placeholder="Filtrar lista..." className="w-full bg-black/40 border-b border-white/10 p-2 text-xs text-white mb-2 outline-none focus:border-accent/50" onClick={(e) => e.stopPropagation()} />
-                 <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-0.5">
+              <div className="space-y-4">
+                 <div className="max-h-72 overflow-y-auto custom-scrollbar space-y-1 pr-2">
                     {availableDirectors.map(d => (
                         <button key={d} onClick={() => toggleSelection('directors', d)}
-                            className={`w-full text-left text-xs px-3 py-2 rounded-lg flex justify-between items-center transition-colors ${filters.directors.includes(d) ? 'bg-accent/10 text-accent font-bold' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+                            className={`w-full text-left text-[11px] px-3 py-2.5 rounded-lg flex justify-between items-center transition-colors ${filters.directors.includes(d) ? 'bg-accent/10 text-accent font-black' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}>
                             {d}
-                            {filters.directors.includes(d) && <Check size={12} />}
+                            {filters.directors.includes(d) && <Check size={14} />}
                         </button>
                     ))}
                  </div>
@@ -200,38 +190,39 @@ const FilterBar = ({
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
         {/* Carrete de Cine: Selector de Décadas */}
-        <div className="relative group">
-            <div className="absolute -top-3 left-0 right-0 h-2 bg-slate-900 flex justify-around px-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                {Array.from({length: 30}).map((_, i) => <div key={i} className="w-1.5 h-1.5 bg-black rounded-full"></div>)}
+        <div className="relative pt-6 pb-2">
+            {/* Perforaciones superiores */}
+            <div className="absolute top-0 left-0 right-0 h-4 bg-black flex justify-around px-8 opacity-60">
+                {Array.from({length: 40}).map((_, i) => <div key={i} className="w-2.5 h-2.5 bg-zinc-900 rounded-sm mt-0.5"></div>)}
             </div>
-            <div className="flex items-center gap-2 overflow-x-auto pb-6 pt-4 px-2 no-scrollbar scroll-smooth">
+            
+            <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-4 px-2 no-scrollbar scroll-smooth">
                 {[2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920, 1900].map(decade => (
                     <button
                         key={decade}
                         onClick={() => setDecade(decade)}
                         className={`
-                            shrink-0 px-6 py-2.5 rounded-md text-xs font-black tracking-widest uppercase transition-all duration-300 border-x-2 border-white/5 relative
-                            ${filters.yearRange[0] === decade 
-                                ? 'bg-accent text-black shadow-[0_0_25px_rgba(234,179,8,0.4)] scale-110' 
-                                : 'bg-white/5 text-slate-500 hover:text-slate-200 hover:bg-white/10'}
+                            shrink-0 px-8 py-3 rounded-md text-[11px] font-black tracking-[0.2em] uppercase transition-all duration-500 border-x border-white/5 relative
+                            ${filters.yearRange[0] === decade && filters.yearRange[1] === (decade === 1900 ? 1919 : decade + 9)
+                                ? 'bg-accent text-black shadow-[0_0_30px_rgba(234,179,8,0.4)] scale-110 z-10' 
+                                : 'bg-zinc-900/60 text-slate-500 hover:text-slate-100 hover:bg-zinc-800'}
                         `}
                     >
-                        {decade === 1900 ? 'Clásico' : decade}s
-                        {filters.yearRange[0] === decade && (
-                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-black rounded-full"></div>
-                        )}
+                        {decade === 1900 ? 'CLÁSICOS' : `${decade}S`}
                     </button>
                 ))}
             </div>
-            <div className="absolute -bottom-3 left-0 right-0 h-2 bg-slate-900 flex justify-around px-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                {Array.from({length: 30}).map((_, i) => <div key={i} className="w-1.5 h-1.5 bg-black rounded-full"></div>)}
+
+            {/* Perforaciones inferiores */}
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-black flex justify-around px-8 opacity-60">
+                {Array.from({length: 40}).map((_, i) => <div key={i} className="w-2.5 h-2.5 bg-zinc-900 rounded-sm mt-0.5"></div>)}
             </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-            <div className="p-1.5 bg-black/20 backdrop-blur-md rounded-2xl border border-white/5 flex gap-2">
+            <div className="p-2 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/5 flex gap-2 shadow-2xl">
                 <FilterButton id="year" label="Año" icon={Calendar} active={activePopover === 'year'} isFiltered={isYearActive} />
                 <FilterButton id="rating" label="Nota" icon={Star} active={activePopover === 'rating'} isFiltered={isRatingActive} />
                 <FilterButton id="genres" label="Género" icon={Film} active={activePopover === 'genres'} count={filters.genres.length || undefined} />
@@ -241,36 +232,12 @@ const FilterBar = ({
             {hasActiveFilters && (
                 <button 
                     onClick={clearFilters}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500/80 hover:bg-red-500/10 transition-all border border-red-500/10"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-red-500 bg-red-500/5 hover:bg-red-500/10 transition-all border border-red-500/10"
                 >
-                    <Trash2 size={12} /> Limpiar Filtros
+                    <Trash2 size={12} /> Limpiar Mesa
                 </button>
             )}
         </div>
-
-        {/* Tags Row */}
-        {hasActiveFilters && (
-            <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300 pl-2">
-                {isYearActive && (
-                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-800/50 border border-slate-700 rounded-full text-[10px] text-slate-300 font-bold uppercase tracking-wide group">
-                        <span>Año: {filters.yearRange[0]} - {filters.yearRange[1]}</span>
-                        <button onClick={() => removeTag('year')} className="hover:text-white"><X size={10} /></button>
-                    </div>
-                )}
-                {isRatingActive && (
-                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-800/50 border border-slate-700 rounded-full text-[10px] text-slate-300 font-bold uppercase tracking-wide group">
-                        <span>Nota: {filters.ratingRange[0]} - {filters.ratingRange[1]}</span>
-                        <button onClick={() => removeTag('rating')} className="hover:text-white"><X size={10} /></button>
-                    </div>
-                )}
-                {filters.genres.map(g => (
-                    <div key={g} className="flex items-center gap-2 px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-[10px] text-accent font-bold uppercase tracking-wide group">
-                        <span>{g}</span>
-                        <button onClick={() => removeTag('genres', g)} className="hover:text-white"><X size={10} /></button>
-                    </div>
-                ))}
-            </div>
-        )}
     </div>
   );
 };
