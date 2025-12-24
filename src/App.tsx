@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Movie, FilterState, ApiKeys, OscarRow } from './types';
 import { parseMoviesCSV, parseOscarExcel, normalizeTitle } from './utils';
@@ -193,7 +194,7 @@ function App() {
                         { id: 'analysis', label: 'Análisis' },
                         { id: 'oscars', label: 'Premios Oscar' },
                         { id: 'afi', label: 'Lista AFI' },
-                        { id: 'random', label: 'Sugerencia' },
+                        { id: 'random', label: 'Qué veo hoy' },
                       ].map(tab => (
                         <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-white border-b-2 border-accent' : 'text-slate-500 hover:text-slate-300'}`}>
                             {tab.label}

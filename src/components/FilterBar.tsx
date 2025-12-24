@@ -52,7 +52,8 @@ const FilterBar = ({
 
   const setRatingBound = (bound: 'min' | 'max', value: number) => {
       setFilters(prev => {
-          const newRange: [number, number] = [...prev.ratingRange];
+          // Fix: Explicitly create a tuple to satisfy TypeScript type checking for line 55
+          const newRange: [number, number] = [prev.ratingRange[0], prev.ratingRange[1]];
           if (bound === 'min') newRange[0] = value;
           else newRange[1] = value;
           
@@ -68,7 +69,10 @@ const FilterBar = ({
     const num = parseInt(val, 10);
     if (isNaN(num)) return;
     setFilters(prev => {
-        const newRange = type === 'year' ? [...prev.yearRange] : [...prev.ratingRange];
+        // Fix: Ensure newRange is treated as a tuple of [number, number] to avoid assignment errors
+        const newRange: [number, number] = type === 'year' 
+            ? [prev.yearRange[0], prev.yearRange[1]] 
+            : [prev.ratingRange[0], prev.ratingRange[1]];
         newRange[index] = num;
         return { ...prev, [type === 'year' ? 'yearRange' : 'ratingRange']: newRange };
     });
