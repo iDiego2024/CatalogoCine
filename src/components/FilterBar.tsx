@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FilterState } from '../types';
-import { ChevronDown, Calendar, Star, Film, Megaphone, X, Check, Filter, Trash2 } from 'lucide-react';
+import { ChevronDown, Calendar, Star, Film, Megaphone, X, Check, Filter, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface FilterBarProps {
   filters: FilterState;
@@ -19,7 +19,7 @@ const FilterBar = ({
   };
 
   const setDecade = (startYear: number) => {
-      const endYear = startYear === 1900 ? 1969 : startYear + 9;
+      const endYear = startYear === 1900 ? 1919 : startYear + 9;
       setFilters(prev => ({ ...prev, yearRange: [startYear, endYear] }));
   };
 
@@ -29,7 +29,6 @@ const FilterBar = ({
           if (bound === 'min') newRange[0] = value;
           else newRange[1] = value;
           
-          // Auto-correct if min > max
           if (newRange[0] > newRange[1]) {
               if (bound === 'min') newRange[1] = value;
               else newRange[0] = value;
@@ -79,12 +78,10 @@ const FilterBar = ({
       setActivePopover(null);
   };
 
-  // Check active states
   const isYearActive = filters.yearRange[0] > 1900 || filters.yearRange[1] < new Date().getFullYear();
   const isRatingActive = filters.ratingRange[0] > 0 || filters.ratingRange[1] < 10;
   const hasActiveFilters = filters.genres.length > 0 || filters.directors.length > 0 || isYearActive || isRatingActive;
 
-  // Render a Filter Button with Popover Logic
   const FilterButton = ({ id, label, icon: Icon, active, count, isFiltered }: { id: string, label: string, icon: any, active: boolean, count?: number, isFiltered?: boolean }) => (
     <div className="relative">
       <button 
@@ -105,7 +102,6 @@ const FilterBar = ({
         <ChevronDown size={12} className={`transition-transform duration-300 opacity-50 ${active ? 'rotate-180' : ''}`} />
       </button>
 
-      {/* Popover */}
       {active && (
         <div className="absolute top-full mt-2 left-0 z-50 min-w-[340px] bg-[#0f172a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200 origin-top-left">
            <div className="mb-4 flex justify-between items-center border-b border-white/5 pb-2">
@@ -117,34 +113,7 @@ const FilterBar = ({
            
            {id === 'year' && (
               <div className="space-y-4">
-                  <div className="grid grid-cols-4 gap-2 mb-4">
-                      {/* Generar décadas desde 2020 hasta 1920 */}
-                      {[2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920].map(y => (
-                          <button 
-                            key={y} 
-                            onClick={() => setDecade(y)}
-                            className={`px-1 py-2 rounded-lg text-xs font-bold border transition-colors ${
-                                filters.yearRange[0] === y && filters.yearRange[1] === y + 9 
-                                ? 'bg-accent text-black border-accent' 
-                                : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
-                            }`}
-                          >
-                              {y}s
-                          </button>
-                      ))}
-                      <button 
-                        onClick={() => setDecade(1900)}
-                        className={`col-span-1 px-1 py-2 rounded-lg text-xs font-bold border transition-colors ${
-                            filters.yearRange[0] === 1900 && filters.yearRange[1] === 1919
-                            ? 'bg-accent text-black border-accent' 
-                            : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                          &lt;1920
-                      </button>
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                  <div className="flex items-center gap-3">
                       <div className="flex-1">
                           <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Desde</label>
                           <input type="number" value={filters.yearRange[0]} onChange={e => handleRangeChange('year', 0, e.target.value)} 
@@ -161,7 +130,6 @@ const FilterBar = ({
 
            {id === 'rating' && (
               <div className="space-y-6">
-                  {/* Min Rating */}
                   <div>
                       <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Mínima</label>
                       <div className="flex gap-1">
@@ -172,11 +140,7 @@ const FilterBar = ({
                                 className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
                                     filters.ratingRange[0] === r 
                                     ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110 z-10' 
-                                    : r <= 4 
-                                        ? 'bg-red-500/10 text-red-500 hover:bg-red-500/30'
-                                        : r >= 8 
-                                            ? 'bg-green-500/10 text-green-400 hover:bg-green-500/30'
-                                            : 'bg-white/5 text-slate-300 hover:bg-white/20'
+                                    : 'bg-white/5 text-slate-300 hover:bg-white/20'
                                 }`}
                               >
                                   {r}
@@ -184,8 +148,6 @@ const FilterBar = ({
                           ))}
                       </div>
                   </div>
-
-                  {/* Max Rating */}
                   <div>
                       <label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2 block">Puntuación Máxima</label>
                       <div className="flex gap-1">
@@ -196,29 +158,12 @@ const FilterBar = ({
                                 className={`flex-1 aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${
                                     filters.ratingRange[1] === r 
                                     ? 'bg-accent text-black shadow-[0_0_10px_rgba(234,179,8,0.5)] scale-110 z-10' 
-                                    : r <= 4 
-                                        ? 'bg-red-500/10 text-red-500 hover:bg-red-500/30'
-                                        : r >= 8 
-                                            ? 'bg-green-500/10 text-green-400 hover:bg-green-500/30'
-                                            : 'bg-white/5 text-slate-300 hover:bg-white/20'
+                                    : 'bg-white/5 text-slate-300 hover:bg-white/20'
                                 }`}
                               >
                                   {r}
                               </button>
                           ))}
-                      </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                      <div className="flex-1">
-                          <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Mínima</label>
-                          <input type="number" min="0" max="10" value={filters.ratingRange[0]} onChange={e => handleRangeChange('rating', 0, e.target.value)} 
-                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" />
-                      </div>
-                      <div className="flex-1">
-                           <label className="text-[9px] uppercase text-slate-500 font-bold mb-1 block">Máxima</label>
-                          <input type="number" min="0" max="10" value={filters.ratingRange[1]} onChange={e => handleRangeChange('rating', 1, e.target.value)} 
-                              className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-center text-xs font-mono focus:border-accent outline-none text-white transition-colors" />
                       </div>
                   </div>
               </div>
@@ -255,21 +200,55 @@ const FilterBar = ({
   );
 
   return (
-    <div className="flex flex-col gap-4">
-        {/* Main Toolbar */}
-        <div className="flex flex-wrap items-center gap-3 p-1.5 bg-black/20 backdrop-blur-md rounded-2xl border border-white/5 w-fit">
-            <div className="px-3 flex items-center gap-2 text-slate-500 border-r border-white/5 mr-1">
-                <Filter size={16} />
-                <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Filtros</span>
+    <div className="flex flex-col gap-6">
+        {/* Carrete de Cine: Selector de Décadas */}
+        <div className="relative group">
+            <div className="absolute -top-3 left-0 right-0 h-2 bg-slate-900 flex justify-around px-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                {Array.from({length: 30}).map((_, i) => <div key={i} className="w-1.5 h-1.5 bg-black rounded-full"></div>)}
             </div>
-            
-            <FilterButton id="year" label="Año" icon={Calendar} active={activePopover === 'year'} isFiltered={isYearActive} />
-            <FilterButton id="rating" label="Nota" icon={Star} active={activePopover === 'rating'} isFiltered={isRatingActive} />
-            <FilterButton id="genres" label="Género" icon={Film} active={activePopover === 'genres'} count={filters.genres.length || undefined} />
-            <FilterButton id="directors" label="Director" icon={Megaphone} active={activePopover === 'directors'} count={filters.directors.length || undefined} />
+            <div className="flex items-center gap-2 overflow-x-auto pb-6 pt-4 px-2 no-scrollbar scroll-smooth">
+                {[2020, 2010, 2000, 1990, 1980, 1970, 1960, 1950, 1940, 1930, 1920, 1900].map(decade => (
+                    <button
+                        key={decade}
+                        onClick={() => setDecade(decade)}
+                        className={`
+                            shrink-0 px-6 py-2.5 rounded-md text-xs font-black tracking-widest uppercase transition-all duration-300 border-x-2 border-white/5 relative
+                            ${filters.yearRange[0] === decade 
+                                ? 'bg-accent text-black shadow-[0_0_25px_rgba(234,179,8,0.4)] scale-110' 
+                                : 'bg-white/5 text-slate-500 hover:text-slate-200 hover:bg-white/10'}
+                        `}
+                    >
+                        {decade === 1900 ? 'Clásico' : decade}s
+                        {filters.yearRange[0] === decade && (
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-black rounded-full"></div>
+                        )}
+                    </button>
+                ))}
+            </div>
+            <div className="absolute -bottom-3 left-0 right-0 h-2 bg-slate-900 flex justify-around px-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                {Array.from({length: 30}).map((_, i) => <div key={i} className="w-1.5 h-1.5 bg-black rounded-full"></div>)}
+            </div>
         </div>
 
-        {/* Active Tags & Reset Row */}
+        <div className="flex flex-wrap items-center gap-3">
+            <div className="p-1.5 bg-black/20 backdrop-blur-md rounded-2xl border border-white/5 flex gap-2">
+                <FilterButton id="year" label="Año" icon={Calendar} active={activePopover === 'year'} isFiltered={isYearActive} />
+                <FilterButton id="rating" label="Nota" icon={Star} active={activePopover === 'rating'} isFiltered={isRatingActive} />
+                <FilterButton id="genres" label="Género" icon={Film} active={activePopover === 'genres'} count={filters.genres.length || undefined} />
+                <FilterButton id="directors" label="Director" icon={Megaphone} active={activePopover === 'directors'} count={filters.directors.length || undefined} />
+            </div>
+
+            {hasActiveFilters && (
+                <button 
+                    onClick={clearFilters}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500/80 hover:bg-red-500/10 transition-all border border-red-500/10"
+                >
+                    <Trash2 size={12} /> Limpiar Filtros
+                </button>
+            )}
+        </div>
+
+        {/* Tags Row */}
         {hasActiveFilters && (
             <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-300 pl-2">
                 {isYearActive && (
@@ -290,19 +269,6 @@ const FilterBar = ({
                         <button onClick={() => removeTag('genres', g)} className="hover:text-white"><X size={10} /></button>
                     </div>
                 ))}
-                {filters.directors.map(d => (
-                    <div key={d} className="flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-[10px] text-purple-400 font-bold uppercase tracking-wide group">
-                        <span>{d}</span>
-                        <button onClick={() => removeTag('directors', d)} className="hover:text-white"><X size={10} /></button>
-                    </div>
-                ))}
-
-                <button 
-                    onClick={clearFilters}
-                    className="ml-2 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
-                >
-                    <Trash2 size={12} /> Limpiar todo
-                </button>
             </div>
         )}
     </div>

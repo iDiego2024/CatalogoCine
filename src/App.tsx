@@ -39,16 +39,18 @@ function App() {
 
   const [apiKeys] = useState<ApiKeys>(DEFAULT_API_KEYS);
 
-  // Load sample data automatically on mount with cache busting
+  // Load data with cache busting
   useEffect(() => {
     const loadData = async () => {
         setIsDataLoading(true);
-        // Usamos cache: 'no-store' para forzar al navegador a ignorar archivos viejos
         try {
             const csvReq = await fetch(`peliculas.csv?t=${Date.now()}`, { cache: 'no-store' });
             if (csvReq.ok) {
                 const text = await csvReq.text();
-                if (text && text.length > 10) setMovies(parseMoviesCSV(text));
+                if (text && text.length > 10) {
+                    const parsed = parseMoviesCSV(text);
+                    setMovies(parsed);
+                }
             }
         } catch (e) { console.warn("Peliculas.csv no disponible"); }
 
@@ -70,6 +72,21 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Sync filters to movie bounds when data arrives
+  useEffect(() => {
+    if (movies.length > 0) {
+      const years = movies.map(m => m.Year).filter((y): y is number => y !== null);
+      if (years.length > 0) {
+        const min = Math.min(...years);
+        const max = Math.max(...years);
+        setFilters(prev => ({
+          ...prev,
+          yearRange: [min, max]
+        }));
+      }
+    }
+  }, [movies]);
+
   const handleClearData = () => {
     setMovies([]);
     setOscarData([]);
@@ -84,7 +101,9 @@ function App() {
     let result = movies.filter(m => {
         const y = m.Year || 0;
         const r = m["Your Rating"] ?? -1;
-        if (y < filters.yearRange[0] || y > filters.yearRange[1]) return false;
+        // Si el año es 0 (no definido), lo dejamos pasar si el rango empieza en 0 o similar, 
+        // pero normalmente filtramos por rango definido
+        if (y !== 0 && (y < filters.yearRange[0] || y > filters.yearRange[1])) return false;
         if (filters.ratingRange[0] > 0 && (r < filters.ratingRange[0] || r > filters.ratingRange[1])) return false;
         if (filters.genres.length && !filters.genres.every(g => m.GenreList.includes(g))) return false;
         if (filters.directors.length && !filters.directors.some(d => m.Directors.includes(d))) return false;
@@ -109,7 +128,10 @@ function App() {
   const handleFileUpload = (file: File, type: 'movies' | 'oscars') => {
     const reader = new FileReader();
     reader.onload = (e) => {
-        if (type === 'movies') setMovies(parseMoviesCSV(e.target?.result as string));
+        if (type === 'movies') {
+            const parsed = parseMoviesCSV(e.target?.result as string);
+            setMovies(parsed);
+        }
         else setOscarData(parseOscarExcel(e.target?.result as ArrayBuffer));
     };
     if (type === 'movies') reader.readAsText(file);
@@ -172,6 +194,9 @@ function App() {
 
   return (
     <div className="min-h-screen text-slate-200 font-sans selection:bg-accent/30 selection:text-white flex flex-col relative">
+      <div className="bg-cinematic"></div>
+      <div className="bg-noise"></div>
+
       <SettingsModal 
         isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
         onFileUpload={handleFileUpload} onClearData={handleClearData}
@@ -185,6 +210,7 @@ function App() {
                   </div>
                   <div className="hidden sm:block">
                       <h1 className="text-xl font-black uppercase bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent leading-none">Mi Cine</h1>
+                      <div className="text-[10px] font-bold text-accent tracking-[0.2em] uppercase opacity-80 mt-1">Catálogo Personal</div>
                   </div>
               </div>
 
@@ -227,12 +253,30 @@ function App() {
       <main className="max-w-[1920px] mx-auto p-4 lg:p-8 w-full flex-1">
             {activeTab === 'catalog' && (
                 <div className="animate-in fade-in duration-700">
-                    <div className="mb-10"><FilterBar filters={filters} setFilters={setFilters} availableGenres={availableGenres} availableDirectors={availableDirectors} /></div>
+                    <div className="mb-10">
+                        <FilterBar 
+                            filters={filters} 
+                            setFilters={setFilters} 
+                            availableGenres={availableGenres} 
+                            availableDirectors={availableDirectors} 
+                        />
+                    </div>
                     
                     {isDataLoading && movies.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                             <Loader2 size={40} className="animate-spin mb-4 text-accent" />
                             <p className="uppercase tracking-widest text-xs">Cargando...</p>
+                        </div>
+                    ) : filteredMovies.length === 0 ? (
+                        <div className="text-center py-20 text-slate-500">
+                            <Clapperboard size={48} className="mx-auto mb-4 opacity-20" />
+                            <p className="uppercase tracking-widest text-sm">No se encontraron películas</p>
+                            <button 
+                                onClick={() => setFilters({yearRange: [1900, 2024], ratingRange: [0, 10], genres: [], directors: []})}
+                                className="mt-4 text-accent text-xs font-bold uppercase hover:underline"
+                            >
+                                Limpiar Filtros
+                            </button>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-x-5 gap-y-10 px-2">
