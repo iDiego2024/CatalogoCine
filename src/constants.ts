@@ -1,14 +1,6 @@
-export const APP_VERSION = "1.2.6";
+export const APP_VERSION = "1.2.0";
 
 export const CHANGELOG: Record<string, string[]> = {
-    "1.2.6": [
-        "Sistema: Consolidación total de la lógica en un archivo maestro para máxima estabilidad.",
-        "Catálogo: Restauración de la paginación fluida (48 títulos por página).",
-        "Análisis: Recuperación de gráficas avanzadas, KPIs y mapa de controversia.",
-        "Oscars: Reparado el desglose de nominaciones y el ranking histórico.",
-        "AFI: Restaurada la galería visual con posters dinámicos y estados de visionado.",
-        "Qué ver hoy: Optimización del selector aleatorio cinemático."
-    ],
     "1.2.0": [
         "Oscars: Nueva vista de desglose detallado por película.",
         "Oscars: Ranking/Leaderboard de películas más premiadas por año.",
@@ -117,7 +109,6 @@ export const AFI_LIST = [
     {"Rank": 88, "Title": "The Sixth Sense", "Year": 1999},
     {"Rank": 89, "Title": "Swing Time", "Year": 1936},
     {"Rank": 90, "Title": "Sophie's Choice", "Year": 1982},
-    {"Rank": 91, "Title": "The Searchers", "Year": 1956},
     {"Rank": 92, "Title": "Goodfellas", "Year": 1990},
     {"Rank": 93, "Title": "The French Connection", "Year": 1971},
     {"Rank": 94, "Title": "Pulp Fiction", "Year": 1994},
