@@ -1,6 +1,12 @@
-export const APP_VERSION = "1.2.0";
+export const APP_VERSION = "1.3.0";
 
 export const CHANGELOG: Record<string, string[]> = {
+    "1.3.0": [
+        "Oscars: Visualización mejorada de nominados (nombres de actores/directores ahora visibles como título).",
+        "Oscars: Integración de notas personales e IMDb en las fichas de nominación.",
+        "Oscars: Vínculos directos a fichas y trailers desde la vista detallada.",
+        "Sistema: Consolidación de datos cruzados entre catálogo personal y premios para máxima precisión."
+    ],
     "1.2.0": [
         "Oscars: Nueva vista de desglose detallado por película.",
         "Oscars: Ranking/Leaderboard de películas más premiadas por año.",

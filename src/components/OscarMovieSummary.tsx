@@ -57,7 +57,7 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
 
   return (
     <div className="glass-panel p-6 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
-         {/* Background Glow */}
+         {/* Background Decoration */}
          <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-black/80 via-black/40 to-transparent z-0"></div>
          {tmdb?.poster_url && (
             <div className="absolute top-0 right-0 w-1/3 h-full opacity-20 pointer-events-none z-0">
@@ -67,7 +67,7 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
          )}
 
          <div className="relative z-10 flex flex-col md:flex-row gap-8">
-             {/* Poster */}
+             {/* Dynamic Poster */}
              <div className="w-40 shrink-0 mx-auto md:mx-0">
                  <div className="aspect-[2/3] rounded-lg overflow-hidden shadow-2xl border border-white/10 relative group">
                     {tmdb?.poster_url ? (
@@ -75,7 +75,7 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
                     ) : (
                         <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-600"><Film size={32}/></div>
                     )}
-                    {/* Catalog Badge */}
+                    {/* Catalog Status */}
                     {catalogMatch && (
                         <div className="absolute top-2 right-2 bg-accent text-black text-[10px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-wider">
                             En catálogo
@@ -84,11 +84,11 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
                  </div>
              </div>
 
-             {/* Details */}
+             {/* Content & Stats */}
              <div className="flex-1">
                  <h2 className="text-3xl font-black text-white leading-tight mb-2 text-glow">{title} <span className="text-slate-500 text-xl font-normal">({year})</span></h2>
                  
-                 {/* Stats Bar */}
+                 {/* Key Stats */}
                  <div className="flex flex-wrap gap-4 mb-6">
                     <div className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-center gap-2">
                         <Trophy size={18} className="text-yellow-500" />
@@ -102,7 +102,7 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
                         <div className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Nominaciones</div>
                     </div>
                     
-                    {/* Ratings */}
+                    {/* Rating Badges */}
                     {(catalogMatch?.["Your Rating"] || displayImdb) && (
                         <div className="flex items-center gap-4 px-4 border-l border-white/10">
                             {catalogMatch?.["Your Rating"] && (
@@ -121,37 +121,35 @@ const OscarMovieSummary: React.FC<OscarMovieSummaryProps> = ({ title, year, osca
                     )}
                  </div>
 
-                 {/* Links Toolbar */}
+                 {/* Action Links */}
                  <div className="flex gap-2 mb-6">
                     <a href={reviewUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-md text-xs font-bold uppercase tracking-wider transition-colors text-slate-300 hover:text-white">
-                        <BookOpen size={14} /> Reseña
+                        <BookOpen size={14} /> Reseñas
                     </a>
                     <a href={trailerUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-md text-xs font-bold uppercase tracking-wider transition-colors text-red-400 hover:text-red-300">
                         <Youtube size={14} /> Trailer
                     </a>
-                    {catalogMatch?.URL && (
-                         <a href={catalogMatch.URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-md text-xs font-bold uppercase tracking-wider transition-colors text-yellow-500 hover:text-yellow-400">
-                            <ExternalLink size={14} /> IMDb Link
-                        </a>
-                    )}
+                    <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 rounded-md text-xs font-bold uppercase tracking-wider transition-colors text-yellow-500 hover:text-yellow-400">
+                        <ExternalLink size={14} /> Ficha IMDb
+                    </a>
                  </div>
 
-                 {/* Nominations List */}
+                 {/* Breakdown List */}
                  <div>
-                     <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-1">Detalle de Nominaciones</h4>
+                     <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-1">Desglose de Nominaciones</h4>
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
                          {sortedRows.map((r, i) => (
-                             <div key={i} className={`flex items-center justify-between py-1.5 border-b border-white/5 ${r.IsWinner ? 'bg-yellow-500/5 -mx-2 px-2 rounded' : ''}`}>
-                                 <div className="min-w-0">
-                                     <div className={`text-xs font-bold ${r.IsWinner ? 'text-yellow-200' : 'text-slate-300'}`}>{r.Category}</div>
-                                     <div className="text-[10px] text-slate-500 truncate">{r.PersonName !== title ? r.PersonName : '-'}</div>
+                             <div key={i} className={`flex items-center justify-between py-2 border-b border-white/5 ${r.IsWinner ? 'bg-yellow-500/5 -mx-2 px-2 rounded' : ''}`}>
+                                 <div className="min-w-0 pr-4">
+                                     <div className={`text-[10px] font-black uppercase tracking-tight ${r.IsWinner ? 'text-yellow-300' : 'text-slate-300'}`}>{r.Category}</div>
+                                     <div className="text-[10px] text-slate-500 truncate font-bold">{r.PersonName}</div>
                                  </div>
                                  {r.IsWinner ? (
-                                     <span className="shrink-0 bg-yellow-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1">
+                                     <span className="shrink-0 bg-yellow-500 text-black text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1 uppercase tracking-tighter">
                                          <Trophy size={8} fill="black"/> GANA
                                      </span>
                                  ) : (
-                                     <span className="shrink-0 text-[9px] text-slate-600 font-bold uppercase">Nom</span>
+                                     <span className="shrink-0 text-[8px] text-slate-700 font-black uppercase">Nom</span>
                                  )}
                              </div>
                          ))}

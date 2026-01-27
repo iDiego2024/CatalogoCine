@@ -1,6 +1,17 @@
-export const APP_VERSION = "1.1.8";
+export const APP_VERSION = "1.3.0";
 
 export const CHANGELOG: Record<string, string[]> = {
+    "1.3.0": [
+        "Oscars: Visualización mejorada de nominados (nombres de actores/directores ahora visibles).",
+        "Oscars: Integración de notas personales e IMDb en las fichas de nominación.",
+        "Oscars: Vínculos directos a fichas y trailers desde la vista detallada.",
+        "Sistema: Consolidación de datos cruzados entre catálogo personal y premios."
+    ],
+    "1.2.0": [
+        "Oscars: Nueva vista de desglose detallado por película.",
+        "Oscars: Ranking/Leaderboard de películas más premiadas por año.",
+        "Mejoras visuales: Nuevo selector de películas y diseño de fichas.",
+    ],
     "1.1.8": [
         "React Port: Migración completa a React + Tailwind.",
         "Optimización: Filtrado y búsqueda instantánea en cliente.",
