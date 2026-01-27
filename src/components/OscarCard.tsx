@@ -44,7 +44,7 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
   return (
     <div className={`group relative bg-[#050505] rounded-xl overflow-hidden transition-all duration-500 hover:z-20 hover:scale-105 hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] border ${item.IsWinner ? 'border-yellow-500/30' : 'border-white/5'} hover:border-white/20`}>
          
-      {/* Poster Area */}
+      {/* Poster */}
       <div className="aspect-[2/3] w-full bg-slate-900 relative overflow-hidden">
         {tmdb?.poster_url ? (
             <img src={tmdb.poster_url} alt={item.Film} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
@@ -71,7 +71,7 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
         </div>
       </div>
 
-      {/* Content Area */}
+      {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
         <h4 className="font-black text-white text-[11px] leading-tight mb-0.5 text-glow uppercase tracking-wide truncate" title={item.PersonName}>
             {item.PersonName}
@@ -80,7 +80,7 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
             {item.Film} ({item.FilmYear})
         </div>
         
-        {/* Ratings Section */}
+        {/* Ratings */}
         <div className="flex items-center gap-2 text-[10px] mb-3 opacity-0 group-hover:opacity-100 transition-opacity">
             {item.MyRating !== null && item.MyRating !== undefined && (
                 <div className={`flex items-center gap-0.5 font-black ${colors.text} bg-white/5 px-1.5 py-0.5 rounded`}>
@@ -95,16 +95,16 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
             )}
         </div>
 
-        {/* Action Toolbar */}
+        {/* Links Overlay */}
         <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100 border-t border-white/10 pt-2 mt-1">
             <div className="grid grid-cols-3 gap-1.5">
-                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-300 transition-colors" title="Ver en IMDb">
+                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-300 transition-colors" title="IMDb">
                     <ExternalLink size={12} />
                  </a>
-                 <a href={trailerUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-red-500/10 hover:bg-red-500/20 rounded text-red-500 transition-colors" title="Ver Trailer">
+                 <a href={trailerUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-red-500/10 hover:bg-red-500/20 rounded text-red-500 transition-colors" title="Trailer">
                     <Youtube size={12} />
                  </a>
-                 <a href={`https://www.google.com/search?q=${encodeURIComponent(item.Film + " " + item.FilmYear + " movie awards")}`} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-400 transition-colors" title="Más Info">
+                 <a href={`https://www.google.com/search?q=${encodeURIComponent(item.Film + " " + item.FilmYear + " movie")}`} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-400 transition-colors">
                     <BookOpen size={12} />
                  </a>
             </div>

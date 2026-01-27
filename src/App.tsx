@@ -10,7 +10,7 @@ import OscarCard from './components/OscarCard';
 import AFICard from './components/AFICard';
 import OscarMovieSummary from './components/OscarMovieSummary';
 import AnalysisView from './components/AnalysisView';
-import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play } from 'lucide-react';
+import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import Fuse from 'fuse.js';
 
 const DEFAULT_API_KEYS: ApiKeys = {
@@ -92,6 +92,8 @@ function App() {
     setCurrentPage(1);
   }, [movies, filters, searchQuery]);
 
+  const totalPages = Math.ceil(filteredMovies.length / ITEMS_PER_PAGE);
+
   const paginatedMovies = useMemo(() => {
       const start = (currentPage - 1) * ITEMS_PER_PAGE;
       return filteredMovies.slice(start, start + ITEMS_PER_PAGE);
@@ -141,7 +143,11 @@ function App() {
       return Object.values(statsMap).sort((a: any, b: any) => b.wins !== a.wins ? b.wins - a.wins : b.noms - a.noms);
   }, [oscarFiltered, oscarYear]);
 
-  // Clase de grid unificada para coherencia en todo el sitio
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const GRID_CLASS = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-6 gap-y-12";
 
   return (
@@ -215,9 +221,81 @@ function App() {
                     ) : filteredMovies.length === 0 ? (
                         <div className="text-center py-40 opacity-20"><Clapperboard size={80} className="mx-auto mb-4" /><p className="font-black uppercase tracking-widest">No se encontraron películas</p></div>
                     ) : (
-                        <div className={GRID_CLASS}>
-                            {paginatedMovies.map((m, i) => <MovieCard key={`${m.Title}-${i}`} movie={m} apiKeys={apiKeys} />)}
-                        </div>
+                        <>
+                            <div className={GRID_CLASS}>
+                                {paginatedMovies.map((m, i) => <MovieCard key={`${m.Title}-${i}`} movie={m} apiKeys={apiKeys} />)}
+                            </div>
+
+                            {/* Paginación Numérica */}
+                            {totalPages > 1 && (
+                                <div className="flex flex-col items-center mt-16 mb-8 gap-4">
+                                    <div className="glass-panel px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
+                                        {/* Prev */}
+                                        <button 
+                                            onClick={() => handlePageChange(currentPage - 1)} 
+                                            disabled={currentPage === 1}
+                                            className="p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-300"
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        
+                                        {/* Page Numbers */}
+                                        <div className="hidden sm:flex items-center gap-1">
+                                            {(() => {
+                                                const pages = [];
+                                                if (totalPages <= 7) {
+                                                    for (let i = 1; i <= totalPages; i++) pages.push(i);
+                                                } else {
+                                                    pages.push(1);
+                                                    if (currentPage > 3) pages.push('...');
+                                                    let start = Math.max(2, currentPage - 1);
+                                                    let end = Math.min(totalPages - 1, currentPage + 1);
+                                                    if (currentPage <= 3) { end = 4; }
+                                                    if (currentPage >= totalPages - 2) { start = totalPages - 3; }
+                                                    for (let i = start; i <= end; i++) pages.push(i);
+                                                    if (currentPage < totalPages - 2) pages.push('...');
+                                                    pages.push(totalPages);
+                                                }
+                                                return pages.map((p, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        onClick={() => typeof p === 'number' && handlePageChange(p)}
+                                                        disabled={p === '...'}
+                                                        className={`
+                                                            w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all
+                                                            ${p === currentPage 
+                                                                ? 'bg-accent text-black shadow-[0_0_15px_rgba(234,179,8,0.5)] scale-110' 
+                                                                : p === '...' 
+                                                                    ? 'text-slate-500 cursor-default' 
+                                                                    : 'text-slate-400 hover:bg-white/10 hover:text-white'}
+                                                        `}
+                                                    >
+                                                        {p}
+                                                    </button>
+                                                ));
+                                            })()}
+                                        </div>
+
+                                        {/* Mobile simple counter (visible only on small screens) */}
+                                        <span className="sm:hidden text-xs font-bold uppercase tracking-widest text-slate-400">
+                                            <span className="text-white">{currentPage}</span> / <span className="text-white">{totalPages}</span>
+                                        </span>
+
+                                        {/* Next */}
+                                        <button 
+                                            onClick={() => handlePageChange(currentPage + 1)} 
+                                            disabled={currentPage === totalPages}
+                                            className="p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-300"
+                                        >
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
+                                    <div className="text-[10px] text-slate-600 uppercase tracking-wider font-bold">
+                                        {filteredMovies.length} Títulos Encontrados
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             )}
@@ -308,6 +386,38 @@ function App() {
                         ))}
                     </div>
                  </div>
+            )}
+
+            {activeTab === 'random' && (
+                <div className="flex flex-col items-center justify-center min-h-[70vh] text-center animate-in fade-in duration-700">
+                    <div className="relative mb-16 group perspective-1000">
+                        <div className="absolute inset-0 bg-accent/30 blur-[60px] rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-1000" />
+                        <button 
+                            onClick={() => {
+                                if (filteredMovies.length > 0) {
+                                    setFilteredMovies([filteredMovies[Math.floor(Math.random() * filteredMovies.length)]]);
+                                }
+                            }}
+                            className="shine-effect relative flex items-center gap-6 px-12 py-8 bg-black border border-accent/50 text-accent font-black text-2xl uppercase tracking-[0.2em] rounded-none hover:border-accent hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] transition-all duration-300 transform group-hover:scale-105"
+                            style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}
+                        >
+                            <Dice5 size={40} className="group-hover:rotate-180 transition-transform duration-700" />
+                            <span>Qué veo hoy</span>
+                        </button>
+                    </div>
+                    
+                    {filteredMovies.length === 1 && (
+                        <div className="max-w-sm w-full animate-in slide-in-from-bottom-8 duration-500">
+                            <MovieCard movie={filteredMovies[0]} apiKeys={apiKeys} showAwards={true} />
+                            <p className="mt-8 text-slate-500 text-sm italic font-serif tracking-wide">"Disfruta la función"</p>
+                            <button onClick={() => {
+                                // Reset filter to show all again or random pick again logic
+                                setSearchQuery(""); 
+                                setFilters(prev => ({...prev})); // Trigger re-filter
+                            }} className="mt-4 text-xs font-bold uppercase tracking-widest text-accent hover:underline">Ver otra</button>
+                        </div>
+                    )}
+                </div>
             )}
 
             {activeTab === 'analysis' && <AnalysisView movies={movies} oscarData={oscarData} />}
