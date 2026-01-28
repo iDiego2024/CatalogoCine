@@ -42,10 +42,25 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
   const colors = getRatingColors(rating);
   const imdbUrl = item.CatalogURL || `https://www.imdb.com/find?q=${encodeURIComponent(item.Film + " " + item.FilmYear)}`;
 
+  // Determine Public Rating (IMDb priority -> TMDb fallback)
+  let publicRating: string | number | null = null;
+  let publicSource: 'IMDb' | 'TMDb' | null = null;
+
+  if (item.MyIMDb) {
+      publicRating = item.MyIMDb;
+      publicSource = 'IMDb';
+  } else if (omdbData?.imdbRating && omdbData.imdbRating !== "N/A") {
+      publicRating = omdbData.imdbRating;
+      publicSource = 'IMDb';
+  } else if (tmdb?.vote_average) {
+      publicRating = tmdb.vote_average.toFixed(1);
+      publicSource = 'TMDb';
+  }
+
   return (
     <div className={`group relative bg-[#050505] rounded-xl overflow-hidden transition-all duration-500 hover:z-20 hover:scale-105 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] border ${item.IsWinner ? 'border-yellow-500/30' : 'border-white/5'} hover:border-white/20 p-3 flex gap-4`}>
          
-      {/* Poster (Increased Size: w-24 h-36) */}
+      {/* Poster (w-24 h-36) */}
       <div className="w-24 h-36 shrink-0 bg-slate-900 relative overflow-hidden shadow-lg rounded-lg border border-white/5">
         {tmdb?.poster_url ? (
             <img src={tmdb.poster_url} alt={item.Film} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
@@ -89,17 +104,19 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
                         <Star size={12} fill="currentColor" /> {item.MyRating}
                     </div>
                 )}
-                {(omdbData?.imdbRating || item.MyIMDb) && (
-                    <div className="text-slate-500 flex items-center gap-1 bg-white/5 px-2 py-1 rounded">
-                       <span className="text-[10px] text-yellow-600 font-bold">IMDb</span> 
-                       <span className="font-bold text-slate-400 text-[11px]">{item.MyIMDb || omdbData?.imdbRating}</span>
+                
+                {/* Public Rating Display */}
+                {publicRating && (
+                    <div className="flex items-center gap-1 bg-white/5 px-2 py-1 rounded text-slate-400">
+                       <span className={`text-[10px] font-bold ${publicSource === 'IMDb' ? 'text-yellow-600' : 'text-sky-500'}`}>{publicSource}</span> 
+                       <span className="font-bold text-slate-300 text-[11px]">{publicRating}</span>
                     </div>
                 )}
             </div>
 
             {/* Micro Links */}
             <div className="flex gap-2 opacity-60 group-hover:opacity-100 transition-opacity duration-300 border-t border-white/5 pt-2">
-                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded" title="IMDb">
+                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded" title="Ficha">
                     <ExternalLink size={12} /> Ficha
                  </a>
                  <a href={trailerUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] text-slate-500 hover:text-red-400 transition-colors bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded" title="Trailer">
