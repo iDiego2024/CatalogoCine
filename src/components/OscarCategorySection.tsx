@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OscarRow, ApiKeys } from '../types';
 import OscarCard from './OscarCard';
 import { ChevronDown, Trophy, Star } from 'lucide-react';
@@ -8,10 +8,19 @@ interface OscarCategorySectionProps {
   category: string;
   items: OscarRow[];
   apiKeys: ApiKeys;
+  forceExpanded?: boolean;
 }
 
-const OscarCategorySection: React.FC<OscarCategorySectionProps> = ({ category, items, apiKeys }) => {
+const OscarCategorySection: React.FC<OscarCategorySectionProps> = ({ category, items, apiKeys, forceExpanded = false }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (forceExpanded) {
+        setIsOpen(true);
+    } else {
+        setIsOpen(false);
+    }
+  }, [forceExpanded]);
 
   // Find winner for the preview text
   const winner = items.find(i => i.IsWinner);
@@ -41,7 +50,7 @@ const OscarCategorySection: React.FC<OscarCategorySectionProps> = ({ category, i
                     {category}
                 </h3>
                 {/* Winner Preview when collapsed */}
-                {!isOpen && winner && (
+                {!isOpen && winner && !forceExpanded && (
                     <div className="text-[10px] text-yellow-500/80 font-bold mt-0.5 flex items-center gap-1.5 animate-in fade-in slide-in-from-left-2">
                         <Trophy size={10} /> 
                         <span className="uppercase tracking-wider">Ganador:</span> 
@@ -66,7 +75,7 @@ const OscarCategorySection: React.FC<OscarCategorySectionProps> = ({ category, i
       {/* Content Grid */}
       <div className={`grid transition-all duration-500 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
         <div className="overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-2">
                 {items.map((o, i) => (
                     <OscarCard key={`${category}-${i}`} item={o} apiKeys={apiKeys} />
                 ))}

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { OscarRow, ApiKeys, TmdbInfo, OmdbAwards } from '../types';
 import { fetchTmdbInfo, getYoutubeTrailer, fetchOmdbAwards, getRatingColors } from '../utils';
@@ -42,70 +43,67 @@ const OscarCard: React.FC<OscarCardProps> = ({ item, apiKeys }) => {
   const imdbUrl = item.CatalogURL || `https://www.imdb.com/find?q=${encodeURIComponent(item.Film + " " + item.FilmYear)}`;
 
   return (
-    <div className={`group relative bg-[#050505] rounded-xl overflow-hidden transition-all duration-500 hover:z-20 hover:scale-105 hover:shadow-[0_20px_60px_-10px_rgba(0,0,0,0.8)] border ${item.IsWinner ? 'border-yellow-500/30' : 'border-white/5'} hover:border-white/20`}>
+    <div className={`group relative bg-[#050505] rounded-lg overflow-hidden transition-all duration-500 hover:z-20 hover:scale-105 hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] border ${item.IsWinner ? 'border-yellow-500/30' : 'border-white/5'} hover:border-white/20`}>
          
-      {/* Poster */}
-      <div className="aspect-[2/3] w-full bg-slate-900 relative overflow-hidden">
+      {/* Poster (Optimized Size) */}
+      <div className="w-14 h-20 shrink-0 bg-slate-900 relative overflow-hidden float-left mr-3 shadow-md">
         {tmdb?.poster_url ? (
             <img src={tmdb.poster_url} alt={item.Film} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
         ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-700">
-                <Film size={24} />
+                <Film size={16} />
             </div>
         )}
         
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1.5 z-20">
-            {item.IsWinner && (
-                <div className="bg-yellow-500 text-black text-[8px] font-black px-2 py-0.5 rounded shadow-lg flex items-center gap-1 uppercase tracking-wider">
-                    <Trophy size={10} fill="black" /> Ganador
-                </div>
-            )}
-            {item.InMyCatalog && (
-                <div className="bg-green-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-lg flex items-center gap-1 uppercase tracking-wider">
-                    <CheckCircle2 size={10} /> Visto
-                </div>
-            )}
-        </div>
+        {item.IsWinner && (
+            <div className="absolute top-0 right-0 bg-yellow-500 text-black p-0.5 shadow-lg z-20">
+                <Trophy size={10} fill="black" />
+            </div>
+        )}
+        {item.InMyCatalog && (
+            <div className="absolute bottom-0 left-0 bg-green-600 text-white p-0.5 shadow-lg z-20">
+                <CheckCircle2 size={8} />
+            </div>
+        )}
       </div>
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-        <h4 className="font-black text-white text-[11px] leading-tight mb-0.5 text-glow uppercase tracking-wide truncate" title={item.PersonName}>
-            {item.PersonName}
-        </h4>
-        <div className="text-[9px] font-bold text-slate-400 mb-2 truncate" title={item.Film}>
-            {item.Film} ({item.FilmYear})
+      <div className="p-2 pl-0 flex flex-col h-20 justify-between">
+        <div>
+            <h4 className="font-bold text-white text-[11px] leading-tight mb-0.5 line-clamp-2" title={item.PersonName}>
+                {item.PersonName}
+            </h4>
+            <div className="text-[9px] font-medium text-slate-400 line-clamp-1" title={item.Film}>
+                {item.Film}
+            </div>
         </div>
         
-        {/* Ratings */}
-        <div className="flex items-center gap-2 text-[10px] mb-3 opacity-0 group-hover:opacity-100 transition-opacity">
-            {item.MyRating !== null && item.MyRating !== undefined && (
-                <div className={`flex items-center gap-0.5 font-black ${colors.text} bg-white/5 px-1.5 py-0.5 rounded`}>
-                    <Star size={10} fill="currentColor" /> {item.MyRating}
-                </div>
-            )}
-            {(omdbData?.imdbRating || item.MyIMDb) && (
-                <div className="text-slate-500 flex items-center gap-1 bg-white/5 px-1.5 py-0.5 rounded">
-                   <span className="text-[8px] text-yellow-500 font-bold uppercase">IMDb</span> 
-                   <span className="font-black text-slate-300">{item.MyIMDb || omdbData?.imdbRating}</span>
-                </div>
-            )}
-        </div>
+        {/* Ratings & Actions */}
+        <div className="flex items-center justify-between mt-1">
+            <div className="flex items-center gap-2 text-[10px]">
+                {item.MyRating !== null && item.MyRating !== undefined && (
+                    <div className={`flex items-center gap-0.5 font-black ${colors.text}`}>
+                        <Star size={8} fill="currentColor" /> {item.MyRating}
+                    </div>
+                )}
+                {(omdbData?.imdbRating || item.MyIMDb) && (
+                    <div className="text-slate-500 flex items-center gap-0.5">
+                       <span className="text-[8px] text-yellow-600 font-bold">IMDb</span> 
+                       <span className="font-bold text-slate-400 text-[9px]">{item.MyIMDb || omdbData?.imdbRating}</span>
+                    </div>
+                )}
+            </div>
 
-        {/* Links Overlay */}
-        <div className="h-0 group-hover:h-auto overflow-hidden transition-all duration-500 opacity-0 group-hover:opacity-100 border-t border-white/10 pt-2 mt-1">
-            <div className="grid grid-cols-3 gap-1.5">
-                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-300 transition-colors" title="IMDb">
-                    <ExternalLink size={12} />
+            {/* Micro Links */}
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                 <a href={imdbUrl} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors" title="IMDb">
+                    <ExternalLink size={10} />
                  </a>
-                 <a href={trailerUrl} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-red-500/10 hover:bg-red-500/20 rounded text-red-500 transition-colors" title="Trailer">
-                    <Youtube size={12} />
-                 </a>
-                 <a href={`https://www.google.com/search?q=${encodeURIComponent(item.Film + " " + item.FilmYear + " movie")}`} target="_blank" rel="noreferrer" className="flex justify-center items-center py-1.5 bg-white/10 hover:bg-white/20 rounded text-slate-400 transition-colors">
-                    <BookOpen size={12} />
+                 <a href={trailerUrl} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-red-500 transition-colors" title="Trailer">
+                    <Youtube size={10} />
                  </a>
             </div>
         </div>

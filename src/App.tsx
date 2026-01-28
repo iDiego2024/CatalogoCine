@@ -559,6 +559,7 @@ function App() {
                                 category={category} 
                                 items={items} 
                                 apiKeys={apiKeys} 
+                                forceExpanded={showOnlyWinners} 
                              />
                         ))}
                     </div>
