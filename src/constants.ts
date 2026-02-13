@@ -1,6 +1,14 @@
-export const APP_VERSION = "1.2.0";
+
+export const APP_VERSION = "1.3.0";
 
 export const CHANGELOG: Record<string, string[]> = {
+    "1.3.0": [
+        "AI: Nueva función 'Qué veo hoy' con recomendaciones inteligentes usando Google Gemini.",
+        "AI: Chat interactivo que sugiere películas de tu catálogo local basado en estado de ánimo o tramas.",
+        "UI: Integración visual de tarjetas de recomendación idénticas al catálogo principal.",
+        "Configuración: Soporte para API Key de Gemini en el panel de ajustes.",
+        "Nav: Actualización de iconos y acceso directo a la función de recomendaciones."
+    ],
     "1.2.0": [
         "Oscars: Nueva vista de desglose detallado por película.",
         "Oscars: Ranking/Leaderboard de películas más premiadas por año.",
