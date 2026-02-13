@@ -65,4 +65,5 @@ export interface ApiKeys {
   tmdb: string;
   omdb: string;
   youtube: string;
+  gemini: string;
 }

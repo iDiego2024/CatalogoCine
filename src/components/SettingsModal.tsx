@@ -1,20 +1,24 @@
+
 import React, { useState } from 'react';
+import { ApiKeys } from '../types';
 import { CHANGELOG } from '../constants';
-import { Upload, Settings, X, FileText, History, Trash2, AlertTriangle } from 'lucide-react';
+import { Upload, Settings, X, FileText, Key, History, Trash2, AlertTriangle, Sparkles } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onFileUpload: (file: File, type: 'movies' | 'oscars') => void;
-  onClearData: () => void;
+  apiKeys: ApiKeys;
+  setApiKeys: (k: ApiKeys) => void;
+  onClearData?: () => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
-  isOpen, onClose, onFileUpload, onClearData
+  isOpen, onClose, onFileUpload, apiKeys, setApiKeys, onClearData
 }) => {
   if (!isOpen) return null;
 
-  const [activeTab, setActiveTab] = useState<'data' | 'changelog'>('data');
+  const [activeTab, setActiveTab] = useState<'data' | 'api' | 'changelog'>('data');
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -38,12 +42,31 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             >
               <FileText size={16} /> Datos
             </button>
+            <button 
+              onClick={() => setActiveTab('api')}
+              className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${activeTab === 'api' ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:bg-white/5'}`}
+            >
+              <Key size={16} /> APIs
+            </button>
              <button 
               onClick={() => setActiveTab('changelog')}
               className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${activeTab === 'changelog' ? 'bg-accent/10 text-accent' : 'text-slate-400 hover:bg-white/5'}`}
             >
               <History size={16} /> Versiones
             </button>
+          </div>
+
+          {/* Mobile Tabs */}
+          <div className="sm:hidden flex border-b border-slate-700">
+            {['data', 'api', 'changelog'].map((tab) => (
+                <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab as any)}
+                    className={`flex-1 py-3 text-center text-xs font-bold uppercase tracking-wide ${activeTab === tab ? 'text-accent border-b-2 border-accent' : 'text-slate-500'}`}
+                >
+                    {tab}
+                </button>
+            ))}
           </div>
 
           {/* Content */}
@@ -80,28 +103,59 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                      </div>
                    </div>
                  </div>
-
-                 {/* Danger Zone: Clear Cache */}
-                 <div className="pt-6 border-t border-red-500/20">
-                    <h3 className="text-sm font-bold text-red-500 uppercase tracking-widest flex items-center gap-2 mb-4">
-                      <AlertTriangle size={14} /> Zona de Peligro
-                    </h3>
-                    <div className="bg-red-500/5 border border-red-500/20 p-4 rounded-xl">
-                      <p className="text-xs text-slate-400 mb-4">
-                        Si has borrado los archivos del servidor pero siguen apareciendo, usa este botón para vaciar el estado actual y forzar una recarga limpia.
-                      </p>
-                      <button 
-                        onClick={() => {
-                          if (confirm("¿Seguro que quieres borrar la caché de datos?")) {
-                            onClearData();
-                          }
-                        }}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-red-600/10 hover:bg-red-600/20 border border-red-600/30 text-red-500 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                      >
-                        <Trash2 size={14} /> Borrar Caché y Datos
-                      </button>
+                 
+                 {onClearData && (
+                    <div className="pt-6 border-t border-red-500/20">
+                        <h3 className="text-sm font-bold text-red-500 uppercase tracking-widest flex items-center gap-2 mb-4">
+                        <AlertTriangle size={14} /> Zona de Peligro
+                        </h3>
+                        <div className="bg-red-500/5 border border-red-500/20 p-4 rounded-xl">
+                        <button 
+                            onClick={() => {
+                            if (confirm("¿Seguro que quieres borrar la caché de datos?")) {
+                                onClearData();
+                            }
+                            }}
+                            className="w-full flex items-center justify-center gap-2 py-3 bg-red-600/10 hover:bg-red-600/20 border border-red-600/30 text-red-500 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                        >
+                            <Trash2 size={14} /> Borrar Caché y Datos
+                        </button>
+                        </div>
                     </div>
-                 </div>
+                 )}
+              </div>
+            )}
+
+            {activeTab === 'api' && (
+              <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                <h3 className="text-lg font-bold text-white mb-4">Configuración de APIs</h3>
+                <div className="space-y-4">
+                  {/* Gemini Key */}
+                  <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl">
+                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-300 mb-2">
+                          <Sparkles size={14} /> Google Gemini API Key
+                      </label>
+                      <input type="password" value={apiKeys.gemini} onChange={e => setApiKeys({...apiKeys, gemini: e.target.value})} 
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none mb-2" placeholder="AI Studio Key para recomendaciones..." />
+                      <p className="text-[10px] text-slate-500">Necesaria para el chat inteligente "Qué veo hoy".</p>
+                  </div>
+
+                  <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">TMDb API Key</label>
+                      <input type="password" value={apiKeys.tmdb} onChange={e => setApiKeys({...apiKeys, tmdb: e.target.value})} 
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none" placeholder="Ingresa tu clave de TMDb" />
+                  </div>
+                  <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">OMDb API Key</label>
+                      <input type="password" value={apiKeys.omdb} onChange={e => setApiKeys({...apiKeys, omdb: e.target.value})} 
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none" placeholder="Ingresa tu clave de OMDb" />
+                  </div>
+                  <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">YouTube API Key</label>
+                      <input type="password" value={apiKeys.youtube} onChange={e => setApiKeys({...apiKeys, youtube: e.target.value})} 
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none" placeholder="Ingresa tu clave de Google Cloud" />
+                  </div>
+                </div>
               </div>
             )}
 

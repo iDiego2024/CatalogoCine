@@ -11,14 +11,16 @@ import AFICard from './components/AFICard';
 import OscarMovieSummary from './components/OscarMovieSummary';
 import OscarCategorySection from './components/OscarCategorySection';
 import AnalysisView from './components/AnalysisView';
-import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play, ChevronLeft, ChevronRight, Check, Flame } from 'lucide-react';
+import AIChatView from './components/AIChatView';
+import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play, ChevronLeft, ChevronRight, Check, Flame, Sparkles } from 'lucide-react';
 import Fuse from 'fuse.js';
 
 // Default API Keys configured for auto-load
 const DEFAULT_API_KEYS: ApiKeys = {
   tmdb: "506c9387e637ecb32fd3b1ab6ade4259",
   omdb: "1b00f496",
-  youtube: "AIzaSyBV8-kbLUzPAT9Pi1JBXP9KQBAjF0gvRHo"
+  youtube: "AIzaSyBV8-kbLUzPAT9Pi1JBXP9KQBAjF0gvRHo",
+  gemini: "" // User must provide
 };
 
 const ITEMS_PER_PAGE = 48;
@@ -148,6 +150,12 @@ function App() {
     if (type === 'movies') reader.readAsText(file);
     else reader.readAsArrayBuffer(file);
   };
+  
+  const handleClearData = () => {
+      setMovies([]);
+      setOscarData([]);
+      setIsSettingsOpen(false);
+  };
 
   const getRandomMovie = () => {
     if (filteredMovies.length === 0) return null;
@@ -255,6 +263,7 @@ function App() {
       <SettingsModal 
         isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
         onFileUpload={handleFileUpload} apiKeys={apiKeys} setApiKeys={setApiKeys}
+        onClearData={handleClearData}
       />
 
       {/* Header */}
@@ -296,7 +305,7 @@ function App() {
                         { id: 'analysis', label: 'Análisis', icon: BarChart3 },
                         { id: 'oscars', label: 'Premios Oscar', icon: Trophy },
                         { id: 'afi', label: 'Lista AFI', icon: Star },
-                        { id: 'random', label: 'Qué veo hoy', icon: Dice5 },
+                        { id: 'random', label: 'Qué veo hoy', icon: Sparkles },
                       ].map(tab => (
                         <button 
                             key={tab.id} 
@@ -347,7 +356,7 @@ function App() {
                   {[
                     { id: 'catalog', icon: List, label: 'Cine' },
                     { id: 'oscars', icon: Trophy, label: 'Oscars' },
-                    { id: 'random', icon: Dice5, label: 'Qué veo hoy' },
+                    { id: 'random', icon: Sparkles, label: 'Qué veo hoy' },
                     { id: 'afi', icon: Star, label: 'AFI' },
                   ].map(tab => (
                      <button 
@@ -666,27 +675,10 @@ function App() {
                  </div>
             )}
 
-            {/* Random Tab */}
+            {/* AI Chat Tab (New Random) */}
             {activeTab === 'random' && (
-                <div className="flex flex-col items-center justify-center min-h-[70vh] text-center animate-in fade-in duration-700">
-                    <div className="relative mb-16 group perspective-1000">
-                        <div className="absolute inset-0 bg-accent/30 blur-[60px] rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-1000" />
-                        <button 
-                            onClick={() => setRandomPick(getRandomMovie())}
-                            className="shine-effect relative flex items-center gap-6 px-12 py-8 bg-black border border-accent/50 text-accent font-black text-2xl uppercase tracking-[0.2em] rounded-none hover:border-accent hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] transition-all duration-300 transform group-hover:scale-105"
-                            style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%)' }}
-                        >
-                            <Dice5 size={40} className="group-hover:rotate-180 transition-transform duration-700" />
-                            <span>Qué veo hoy</span>
-                        </button>
-                    </div>
-                    
-                    {randomPick && (
-                        <div className="max-w-sm w-full animate-in slide-in-from-bottom-8 duration-500">
-                            <MovieCard movie={randomPick} apiKeys={apiKeys} showAwards={true} />
-                            <p className="mt-8 text-slate-500 text-sm italic font-serif tracking-wide">"Disfruta la función"</p>
-                        </div>
-                    )}
+                <div className="animate-in fade-in duration-700 h-[85vh]">
+                    <AIChatView movies={filteredMovies} apiKeys={apiKeys} onOpenSettings={() => setIsSettingsOpen(true)} />
                 </div>
             )}
       </main>
