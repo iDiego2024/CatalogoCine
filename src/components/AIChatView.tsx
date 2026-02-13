@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { Movie, ApiKeys } from '../types';
 import MovieCard from './MovieCard';
-import { Send, Sparkles, Bot, User, Loader2, PlayCircle, Info } from 'lucide-react';
+import { Send, Sparkles, Bot, User, Loader2, Info } from 'lucide-react';
 
 interface AIChatViewProps {
   movies: Movie[];
@@ -64,32 +64,24 @@ const AIChatView: React.FC<AIChatViewProps> = ({ movies, apiKeys, onOpenSettings
 
         const ai = new GoogleGenAI({ apiKey: apiKeys.gemini });
         
-        const systemPrompt = `
-            Actúa como un experto cinéfilo y sommelier de películas.
-            Tienes acceso al catálogo personal del usuario (JSON adjunto).
-            Tu objetivo es recomendar de 1 a 4 películas EXCLUSIVAMENTE de este catálogo que coincidan con la petición del usuario.
-            
-            Reglas:
-            1. Solo recomienda películas que estén en la lista proporcionada.
-            2. Si la petición es abstracta (ej: "algo triste"), infiere basándote en géneros, directores y conocimiento general del cine.
-            3. Prioriza películas con alta calificación personal ("myRating") si el usuario pide "lo mejor".
-            4. Devuelve la respuesta en formato JSON estricto.
-        `;
-
+        // Using Gemini 2.5 Flash for speed and complex JSON capabilities
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-latest',
             contents: `
-                CATÁLOGO DEL USUARIO: ${JSON.stringify(catalogContext)}
+                CATÁLOGO DEL USUARIO (JSON): 
+                ${JSON.stringify(catalogContext)}
                 
                 PETICIÓN DEL USUARIO: "${text}"
                 
-                Responde con este esquema JSON:
-                {
-                    "reply": "Texto breve y con estilo conversacional explicando la selección.",
-                    "recommendations": [
-                        { "title": "Exact Title from Catalog", "year": 2000, "reason": "Por qué encaja con la petición." }
-                    ]
-                }
+                TU TAREA:
+                Actúa como un experto cinéfilo y sommelier de películas.
+                Recomienda de 1 a 4 películas EXCLUSIVAMENTE de este catálogo que coincidan con la petición del usuario.
+                
+                Reglas:
+                1. Solo recomienda películas que estén en la lista proporcionada.
+                2. Si la petición es abstracta (ej: "algo triste"), infiere basándote en géneros, directores y conocimiento general del cine.
+                3. Prioriza películas con alta calificación personal ("myRating") si el usuario pide "lo mejor".
+                4. Devuelve la respuesta en formato JSON estricto.
             `,
             config: {
                 responseMimeType: "application/json",
@@ -144,7 +136,7 @@ const AIChatView: React.FC<AIChatViewProps> = ({ movies, apiKeys, onOpenSettings
 
     } catch (error) {
         console.error("Gemini Error:", error);
-        setMessages(prev => [...prev, { role: 'model', text: "Lo siento, hubo un error conectando con mi cerebro cinéfilo. Verifica tu API Key." }]);
+        setMessages(prev => [...prev, { role: 'model', text: "Lo siento, hubo un error conectando con mi cerebro cinéfilo. Verifica tu API Key o intenta de nuevo." }]);
     } finally {
         setIsLoading(false);
     }
@@ -159,7 +151,7 @@ const AIChatView: React.FC<AIChatViewProps> = ({ movies, apiKeys, onOpenSettings
             </div>
             <div>
                 <h2 className="text-lg font-black text-white leading-none">Cinephile AI</h2>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Powered by Gemini 2.5</p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Powered by Gemini</p>
             </div>
             {!apiKeys.gemini && (
                 <button onClick={onOpenSettings} className="ml-auto text-xs bg-red-500/10 text-red-400 px-3 py-1 rounded-full border border-red-500/20 hover:bg-red-500/20 transition-colors">
@@ -196,7 +188,7 @@ const AIChatView: React.FC<AIChatViewProps> = ({ movies, apiKeys, onOpenSettings
                             {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                         </div>
                         
-                        <div className={`max-w-[85%] space-y-4`}>
+                        <div className={`max-w-[90%] md:max-w-[85%] space-y-4`}>
                             {/* Text Bubble */}
                             <div className={`p-4 rounded-2xl text-sm leading-relaxed shadow-lg ${
                                 msg.role === 'user' 
@@ -208,18 +200,18 @@ const AIChatView: React.FC<AIChatViewProps> = ({ movies, apiKeys, onOpenSettings
 
                             {/* Recommendations Grid */}
                             {msg.recommendations && msg.recommendations.length > 0 && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4 w-full">
                                     {msg.recommendations.map((movie, mIdx) => {
                                         const reason = msg.reasoning?.find(r => r.title === movie.Title)?.reason;
                                         return (
-                                            <div key={mIdx} className="flex flex-col gap-2 group">
-                                                <div className="relative transform transition-transform duration-300 group-hover:-translate-y-1">
-                                                     <MovieCard movie={movie} apiKeys={apiKeys} showAwards={true} />
+                                            <div key={mIdx} className="flex flex-col gap-3 group/item animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: `${mIdx * 100}ms` }}>
+                                                <div className="relative z-10 transition-transform duration-300 group-hover/item:-translate-y-1">
+                                                     <MovieCard movie={movie} apiKeys={apiKeys} />
                                                 </div>
                                                 {reason && (
-                                                    <div className="bg-black/40 border border-white/5 p-2 rounded-lg text-[10px] text-indigo-200 italic flex gap-2">
-                                                        <Info size={12} className="shrink-0 mt-0.5" />
-                                                        {reason}
+                                                    <div className="bg-white/5 border border-white/5 px-3 py-2 rounded-xl text-[10px] text-indigo-300 leading-relaxed flex gap-2 backdrop-blur-sm">
+                                                        <Info size={12} className="shrink-0 mt-0.5 text-indigo-400" />
+                                                        <span>{reason}</span>
                                                     </div>
                                                 )}
                                             </div>

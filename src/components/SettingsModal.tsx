@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ApiKeys } from '../types';
 import { CHANGELOG } from '../constants';
-import { Upload, Settings, X, FileText, Key, History, Trash2, AlertTriangle, Sparkles } from 'lucide-react';
+import { Upload, Settings, X, FileText, Key, History, Sparkles } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -72,57 +72,43 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* Content */}
           <div className="flex-1 p-6 overflow-y-auto">
             {activeTab === 'data' && (
-              <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-                 <div>
-                   <h3 className="text-lg font-bold text-white mb-4">Cargar Archivos</h3>
-                   <div className="space-y-4">
-                     <div className="p-4 rounded-xl border border-dashed border-slate-600 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
-                        <label className="block cursor-pointer">
-                          <div className="flex items-center gap-3 mb-2">
-                             <div className="p-2 bg-accent/10 rounded-lg text-accent"><Upload size={20} /></div>
-                             <div>
-                               <div className="font-bold text-slate-200">CSV Películas (IMDb)</div>
-                               <div className="text-xs text-slate-500">Sube tu exportación de IMDb</div>
-                             </div>
-                          </div>
-                          <input type="file" accept=".csv" className="hidden" onChange={(e) => e.target.files?.[0] && onFileUpload(e.target.files[0], 'movies')} />
-                        </label>
-                     </div>
-
-                     <div className="p-4 rounded-xl border border-dashed border-slate-600 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
-                        <label className="block cursor-pointer">
-                          <div className="flex items-center gap-3 mb-2">
-                             <div className="p-2 bg-accent-alt/10 rounded-lg text-accent-alt"><Upload size={20} /></div>
-                             <div>
-                               <div className="font-bold text-slate-200">Excel Oscars</div>
-                               <div className="text-xs text-slate-500">Base de datos de premios</div>
-                             </div>
-                          </div>
-                          <input type="file" accept=".xlsx" className="hidden" onChange={(e) => e.target.files?.[0] && onFileUpload(e.target.files[0], 'oscars')} />
-                        </label>
-                     </div>
-                   </div>
-                 </div>
-                 
-                 {onClearData && (
-                    <div className="pt-6 border-t border-red-500/20">
-                        <h3 className="text-sm font-bold text-red-500 uppercase tracking-widest flex items-center gap-2 mb-4">
-                        <AlertTriangle size={14} /> Zona de Peligro
-                        </h3>
-                        <div className="bg-red-500/5 border border-red-500/20 p-4 rounded-xl">
-                        <button 
-                            onClick={() => {
-                            if (confirm("¿Seguro que quieres borrar la caché de datos?")) {
-                                onClearData();
-                            }
-                            }}
-                            className="w-full flex items-center justify-center gap-2 py-3 bg-red-600/10 hover:bg-red-600/20 border border-red-600/30 text-red-500 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                        >
-                            <Trash2 size={14} /> Borrar Caché y Datos
-                        </button>
+              <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                 <h3 className="text-lg font-bold text-white mb-4">Cargar Archivos</h3>
+                 <div className="space-y-4">
+                   <div className="p-4 rounded-xl border border-dashed border-slate-600 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                      <label className="block cursor-pointer">
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="p-2 bg-accent/10 rounded-lg text-accent"><Upload size={20} /></div>
+                           <div>
+                             <div className="font-bold text-slate-200">CSV Películas (IMDb)</div>
+                             <div className="text-xs text-slate-500">Sube tu exportación de IMDb</div>
+                           </div>
                         </div>
-                    </div>
-                 )}
+                        <input type="file" accept=".csv" className="hidden" onChange={(e) => e.target.files?.[0] && onFileUpload(e.target.files[0], 'movies')} />
+                      </label>
+                   </div>
+
+                   <div className="p-4 rounded-xl border border-dashed border-slate-600 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                      <label className="block cursor-pointer">
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="p-2 bg-accent-alt/10 rounded-lg text-accent-alt"><Upload size={20} /></div>
+                           <div>
+                             <div className="font-bold text-slate-200">Excel Oscars</div>
+                             <div className="text-xs text-slate-500">Base de datos de premios</div>
+                           </div>
+                        </div>
+                        <input type="file" accept=".xlsx" className="hidden" onChange={(e) => e.target.files?.[0] && onFileUpload(e.target.files[0], 'oscars')} />
+                      </label>
+                   </div>
+                   
+                   {onClearData && (
+                     <div className="pt-4 mt-4 border-t border-white/10">
+                        <button onClick={onClearData} className="text-xs text-red-400 hover:text-red-300 font-bold uppercase tracking-wider">
+                           Borrar datos almacenados
+                        </button>
+                     </div>
+                   )}
+                 </div>
               </div>
             )}
 
