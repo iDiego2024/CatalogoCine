@@ -11,16 +11,14 @@ import AFICard from './components/AFICard';
 import OscarMovieSummary from './components/OscarMovieSummary';
 import OscarCategorySection from './components/OscarCategorySection';
 import AnalysisView from './components/AnalysisView';
-import AIChatView from './components/AIChatView';
-import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play, ChevronLeft, ChevronRight, Check, Flame, Sparkles } from 'lucide-react';
+import { Search, Trophy, Clapperboard, List, Dice5, Star, Settings, BarChart3, Loader2, Play, ChevronLeft, ChevronRight, Check, Flame } from 'lucide-react';
 import Fuse from 'fuse.js';
 
 // Default API Keys configured for auto-load
 const DEFAULT_API_KEYS: ApiKeys = {
   tmdb: "506c9387e637ecb32fd3b1ab6ade4259",
   omdb: "1b00f496",
-  youtube: "AIzaSyBV8-kbLUzPAT9Pi1JBXP9KQBAjF0gvRHo",
-  gemini: "" // User must provide
+  youtube: "AIzaSyBV8-kbLUzPAT9Pi1JBXP9KQBAjF0gvRHo"
 };
 
 const ITEMS_PER_PAGE = 48;
@@ -305,7 +303,7 @@ function App() {
                         { id: 'analysis', label: 'Análisis', icon: BarChart3 },
                         { id: 'oscars', label: 'Premios Oscar', icon: Trophy },
                         { id: 'afi', label: 'Lista AFI', icon: Star },
-                        { id: 'random', label: 'Qué veo hoy', icon: Sparkles },
+                        { id: 'random', label: 'Qué veo hoy', icon: Dice5 },
                       ].map(tab => (
                         <button 
                             key={tab.id} 
@@ -356,7 +354,7 @@ function App() {
                   {[
                     { id: 'catalog', icon: List, label: 'Cine' },
                     { id: 'oscars', icon: Trophy, label: 'Oscars' },
-                    { id: 'random', icon: Sparkles, label: 'Qué veo hoy' },
+                    { id: 'random', icon: Dice5, label: 'Qué veo hoy' },
                     { id: 'afi', icon: Star, label: 'AFI' },
                   ].map(tab => (
                      <button 
@@ -667,7 +665,7 @@ function App() {
                                 rank={a.Rank} 
                                 title={a.Title} 
                                 year={a.Year} 
-                                movie={movies.find(m => m.NormTitle === normalizeTitle(a.Title))} 
+                                movie={movies.find(m => m.NormTitle === normalizeTitle(a.Title)) || null} 
                                 apiKeys={apiKeys} 
                             />
                         ))}
@@ -675,10 +673,38 @@ function App() {
                  </div>
             )}
 
-            {/* AI Chat Tab (New Random) */}
+            {/* Random Movie Tab */}
             {activeTab === 'random' && (
-                <div className="animate-in fade-in duration-700 h-[85vh]">
-                    <AIChatView movies={filteredMovies} apiKeys={apiKeys} onOpenSettings={() => setIsSettingsOpen(true)} />
+                <div className="animate-in fade-in duration-700 h-[85vh] flex flex-col items-center justify-center">
+                    <div className="max-w-md w-full glass-panel p-8 rounded-3xl border border-white/10 shadow-2xl text-center">
+                        <div className="w-20 h-20 bg-gradient-to-br from-accent to-yellow-600 rounded-2xl flex items-center justify-center text-primary shadow-lg mx-auto mb-8 animate-bounce-slow">
+                            <Dice5 size={40} strokeWidth={2.5} />
+                        </div>
+                        
+                        <h2 className="text-3xl font-black text-white uppercase tracking-tight mb-4">¿Qué vemos hoy?</h2>
+                        <p className="text-slate-400 text-sm mb-8">Deja que el azar elija tu próxima gran historia del cine.</p>
+                        
+                        {randomPick ? (
+                            <div className="mb-8 animate-in zoom-in-95 duration-500">
+                                <div className="max-w-[200px] mx-auto mb-4">
+                                    <MovieCard movie={randomPick} apiKeys={apiKeys} />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-1">{randomPick.Title}</h3>
+                                <p className="text-accent text-xs font-bold uppercase tracking-widest">{randomPick.Year}</p>
+                            </div>
+                        ) : (
+                            <div className="h-[300px] flex items-center justify-center border-2 border-dashed border-white/5 rounded-2xl mb-8">
+                                <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">Haz clic para tirar los dados</p>
+                            </div>
+                        )}
+                        
+                        <button 
+                            onClick={() => setRandomPick(getRandomMovie())}
+                            className="w-full py-4 bg-accent hover:bg-yellow-400 text-primary font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(234,179,8,0.5)] transition-all duration-300 active:scale-95"
+                        >
+                            {randomPick ? 'Tirar de nuevo' : 'Elegir Película'}
+                        </button>
+                    </div>
                 </div>
             )}
       </main>

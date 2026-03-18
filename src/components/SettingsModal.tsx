@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ApiKeys } from '../types';
 import { CHANGELOG } from '../constants';
-import { Upload, Settings, X, FileText, Key, History, Sparkles } from 'lucide-react';
+import { Upload, Settings, X, FileText, Key, History } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -116,16 +116,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
                 <h3 className="text-lg font-bold text-white mb-4">Configuración de APIs</h3>
                 <div className="space-y-4">
-                  {/* Gemini Key */}
-                  <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl">
-                      <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-300 mb-2">
-                          <Sparkles size={14} /> Google Gemini API Key
-                      </label>
-                      <input type="password" value={apiKeys.gemini} onChange={e => setApiKeys({...apiKeys, gemini: e.target.value})} 
-                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:border-accent outline-none mb-2" placeholder="AI Studio Key para recomendaciones..." />
-                      <p className="text-[10px] text-slate-500">Necesaria para el chat inteligente "Qué veo hoy".</p>
-                  </div>
-
                   <div>
                       <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 block">TMDb API Key</label>
                       <input type="password" value={apiKeys.tmdb} onChange={e => setApiKeys({...apiKeys, tmdb: e.target.value})} 
