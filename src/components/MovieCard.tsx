@@ -82,10 +82,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
       </div>
 
       {/* --- Content Overlay (Slide Up Effect) --- */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ease-out">
+      <div className="absolute bottom-0 left-0 right-0 p-3 bg-slate-950/95 backdrop-blur-md border-t border-accent/30 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 ease-out rounded-b-xl">
         
         {/* Title */}
-        <h3 className="font-bold text-white text-base leading-tight mb-1 text-shadow-sm line-clamp-2 group-hover:text-accent transition-colors">
+        <h3 className="font-bold text-white text-[12px] leading-tight mb-1.5 text-shadow-sm line-clamp-2 group-hover:text-accent transition-colors">
             {movie.Title}
         </h3>
         
@@ -142,7 +142,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
       </div>
       
       {/* Selection Border Glow */}
-      <div className="absolute inset-0 border-2 border-transparent group-hover:border-white/10 rounded-xl pointer-events-none transition-colors duration-300"></div>
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-white/20 rounded-xl pointer-events-none transition-all duration-300 z-30"></div>
     </div>
   );
 };
