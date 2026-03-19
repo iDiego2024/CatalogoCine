@@ -44,10 +44,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
     : `https://www.youtube.com/results?search_query=${encodeURIComponent(movie.Title + " trailer")}`;
 
   return (
-    <div className="group relative bg-[#050505] rounded-xl overflow-hidden shadow-lg transition-all duration-500 hover:z-20 hover:scale-[1.03] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.9)] border border-white/5 hover:border-white/20">
+    <div className="group relative bg-[#050505] rounded-lg overflow-hidden shadow-lg transition-all duration-500 hover:z-20 hover:scale-[1.03] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.9)] border border-white/5 hover:border-white/20 hover:ring-1 hover:ring-white/20">
          
       {/* Poster Image */}
-      <div className="aspect-[2/3] w-full bg-slate-900 relative overflow-hidden">
+      <div className="aspect-[2/3] w-full bg-slate-900 relative overflow-hidden border-b border-white/5">
         {tmdb?.poster_url ? (
             <img src={tmdb.poster_url} alt={movie.Title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:saturate-[1.2]" loading="lazy" />
         ) : (
@@ -82,19 +82,19 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
       </div>
 
       {/* --- Content Overlay (Slide Up Effect) --- */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ease-out">
+      <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 ease-out">
         
         {/* Title */}
-        <h3 className="font-bold text-white text-lg leading-tight mb-1 text-shadow-sm line-clamp-2 group-hover:text-accent transition-colors">
+        <h3 className="font-bold text-white text-base leading-tight mb-1 text-shadow-sm line-clamp-2 group-hover:text-accent transition-colors">
             {movie.Title}
         </h3>
         
         {/* Metadata Line */}
-        <div className="flex items-center gap-3 text-xs font-medium text-slate-300 mb-3">
-             <span className="flex items-center gap-1 opacity-80"><Calendar size={12}/> {movie.Year}</span>
+        <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider">
+             <span className="flex items-center gap-1 opacity-80"><Calendar size={10}/> {movie.Year}</span>
              {movie["IMDb Rating"] && (
                  <span className="flex items-center gap-1 text-yellow-500/90 bg-yellow-500/10 px-1.5 rounded border border-yellow-500/20">
-                     <span className="font-bold">IMDb</span> {movie["IMDb Rating"]}
+                     <span className="font-black">IMDb</span> {movie["IMDb Rating"]}
                  </span>
              )}
         </div>
