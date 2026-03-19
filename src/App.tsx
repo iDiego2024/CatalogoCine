@@ -436,7 +436,7 @@ function App() {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-x-8 gap-y-12 px-2">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-x-8 gap-y-12 px-2">
                                 {paginatedMovies.map((m, i) => (
                                     <MovieCard key={`${m.Title}-${i}`} movie={m} apiKeys={apiKeys} />
                                 ))}

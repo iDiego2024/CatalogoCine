@@ -44,12 +44,12 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
     : `https://www.youtube.com/results?search_query=${encodeURIComponent(movie.Title + " trailer")}`;
 
   return (
-    <div className="group relative bg-[#050505] rounded-lg overflow-hidden shadow-lg transition-all duration-500 hover:z-20 hover:scale-[1.03] hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.9)] border border-white/5 hover:border-white/20 hover:ring-1 hover:ring-white/20">
+    <div className="group relative bg-[#050505] rounded-xl overflow-hidden shadow-lg transition-all duration-500 hover:z-20 hover:scale-[1.05] hover:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.9)] border border-white/5 hover:border-white/20 hover:ring-1 hover:ring-white/20">
          
       {/* Poster Image */}
       <div className="aspect-[2/3] w-full bg-slate-900 relative overflow-hidden border-b border-white/5">
         {tmdb?.poster_url ? (
-            <img src={tmdb.poster_url} alt={movie.Title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:saturate-[1.2]" loading="lazy" />
+            <img src={tmdb.poster_url} alt={movie.Title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:saturate-[1.1]" loading="lazy" />
         ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-700">
                 <Film size={40} />
@@ -57,8 +57,13 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, apiKeys, showAwards }) => 
             </div>
         )}
         
+        {/* Shine Effect Overlay */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-10">
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+        </div>
+
         {/* Dark Gradient Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-300 z-0" />
         
         {/* --- Top Badges (Always Visible) --- */}
         <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-start">
